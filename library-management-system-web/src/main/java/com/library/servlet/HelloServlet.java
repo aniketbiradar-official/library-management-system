@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Servlet implementation class HelloServlet
  */
-@WebServlet({ "/HelloServlet", "/hello" })
+@WebServlet({"/hello" })
 public class HelloServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -28,9 +28,10 @@ public class HelloServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        response.setContentType("text/html");
-        response.getWriter().println("<h1>Hello Library Management System</h1>");
+        request.getRequestDispatcher("/WEB-INF/views/hello.jsp")
+               .forward(request, response);
     }
+
 
 
 	/**
