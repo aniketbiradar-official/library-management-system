@@ -56,18 +56,28 @@ public class BookController extends HttpServlet {
 		request.getRequestDispatcher("/WEB-INF/views/book/book-add.jsp").forward(request, response);
 	}
 	
-	private void addBook(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	private void addBook(HttpServletRequest request, HttpServletResponse response) throws ServletException,IOException {
 		
-		Book book = new Book();
+		try {
+			Book book = new Book();
 		
-		book.setTitle(request.getParameter("title"));
-		book.setAuthor(request.getParameter("author"));
-		book.setIsbn(request.getParameter("isbn"));
-		book.setTotalCopies(Integer.parseInt(request.getParameter("totalCopies")));
-		book.setCategory(request.getParameter("category"));
+			book.setTitle(request.getParameter("title"));
+			book.setAuthor(request.getParameter("author"));
+			book.setIsbn(request.getParameter("isbn"));
+			book.setTotalCopies(Integer.parseInt(request.getParameter("totalCopies")));
+			book.setCategory(request.getParameter("category"));
 		
-		bookService.addBook(book);
+			bookService.addBook(book);
 		
-		response.sendRedirect(request.getContextPath());
+			response.sendRedirect(request.getContextPath());
+		} catch (RuntimeException e) {
+			if ("ISBN_ALREADY_EXISTS".equals(e.getMessage())) {
+				request.setAttribute("error", "A book with this ISBN already exists.");
+				request.getRequestDispatcher("/WEB-INF/views/book/book-add.jsp").forward(request, response);
+			}
+			else {
+				throw e; // unexpected error → let server log it
+			}
+		}
 	}
 }

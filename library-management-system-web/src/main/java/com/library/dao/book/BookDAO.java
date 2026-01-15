@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +58,9 @@ public class BookDAO {
 				books.add(book);
 				
 			}
-		} catch (SQLException e) {
+		} catch (SQLIntegrityConstraintViolationException e) {
+	        throw new RuntimeException("ISBN_ALREADY_EXISTS");
+	    } catch (SQLException e) {
 			throw new RuntimeException("Error fetching books", e);
 		}
 		
