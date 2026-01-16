@@ -22,6 +22,7 @@
         	<th>Total</th>
         	<th>Available</th>
         	<th>Category</th>
+        	<th>Actions</th>
         </tr>
         
         <c:forEach var="book" items="${books}">

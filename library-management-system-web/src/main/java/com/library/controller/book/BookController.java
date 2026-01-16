@@ -26,6 +26,10 @@ public class BookController extends HttpServlet {
 			listBooks(request, response);
 		else if ("/add".equals(path))
 			showAddForm(request, response);
+		else if ("/edit".equals(path))
+		    showEditForm(request, response);
+		else if ("/delete".equals(path)) 
+		    deleteBook(request, response);
 		else
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		
@@ -38,6 +42,8 @@ public class BookController extends HttpServlet {
 		
 		if ("/add".equals(path))
 			addBook(request, response);
+		else if ("/edit".equals(path)) 
+		    updateBook(request, response);
 		else
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 		
@@ -80,4 +86,41 @@ public class BookController extends HttpServlet {
 			}
 		}
 	}
+	
+	private void showEditForm(HttpServletRequest request, HttpServletResponse response)
+	        throws ServletException, IOException {
+
+	    int id = Integer.parseInt(request.getParameter("id"));
+	    Book book = bookService.getBookById(id);
+	    request.setAttribute("book", book);
+
+	    request.getRequestDispatcher("/WEB-INF/views/book/book-edit.jsp")
+	           .forward(request, response);
+	}
+
+	private void updateBook(HttpServletRequest request, HttpServletResponse response)
+	        throws IOException {
+
+	    Book book = new Book();
+	    book.setId(Integer.parseInt(request.getParameter("id")));
+	    book.setTitle(request.getParameter("title"));
+	    book.setAuthor(request.getParameter("author"));
+	    book.setIsbn(request.getParameter("isbn"));
+	    book.setTotalCopies(Integer.parseInt(request.getParameter("totalCopies")));
+	    book.setCategory(request.getParameter("category"));
+
+	    bookService.updateBook(book);
+
+	    response.sendRedirect(request.getContextPath() + "/books");
+	}
+
+	private void deleteBook(HttpServletRequest request, HttpServletResponse response)
+	        throws IOException {
+
+	    int id = Integer.parseInt(request.getParameter("id"));
+	    bookService.deleteBook(id);
+
+	    response.sendRedirect(request.getContextPath() + "/books");
+	}
+
 }
