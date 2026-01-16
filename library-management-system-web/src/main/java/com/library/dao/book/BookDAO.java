@@ -93,18 +93,47 @@ public class BookDAO {
 		return null;
 	}
 	
-	public void updateBook(Book book) {
-	    String sql = "UPDATE books SET title=?, author=?, isbn=?, total_copies=?, category=? WHERE id=?";
+	private int getIssuedCopies(int bookId) throws SQLException {
+	    String sql = "SELECT total_copies, available_copies FROM books WHERE id = ?";
 
 	    try (Connection conn = DBConnectionUtil.getConnection();
 	         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+	        ps.setInt(1, bookId);
+	        ResultSet rs = ps.executeQuery();
+
+	        if (rs.next()) {
+	            int total = rs.getInt("total_copies");
+	            int available = rs.getInt("available_copies");
+	            return total - available;
+	        }
+	    }
+	    return 0;
+	}
+
+	
+	public void updateBook(Book book) {
+	    String sql = "UPDATE books SET title=?, author=?, isbn=?, total_copies=?, available_copies=?, category=? WHERE id=?";
+
+	    try (Connection conn = DBConnectionUtil.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+	        int issuedCopies = getIssuedCopies(book.getId());
+	        int newAvailable = book.getTotalCopies() - issuedCopies;
+
+	        if (newAvailable < 0) {
+	            throw new RuntimeException(
+	                "Total copies cannot be less than already issued copies"
+	            );
+	        }
 
 	        ps.setString(1, book.getTitle());
 	        ps.setString(2, book.getAuthor());
 	        ps.setString(3, book.getIsbn());
 	        ps.setInt(4, book.getTotalCopies());
-	        ps.setString(5, book.getCategory());
-	        ps.setInt(6, book.getId());
+	        ps.setInt(5, newAvailable);
+	        ps.setString(6, book.getCategory());
+	        ps.setInt(7, book.getId());
 
 	        ps.executeUpdate();
 
@@ -112,6 +141,7 @@ public class BookDAO {
 	        throw new RuntimeException("Error updating book", e);
 	    }
 	}
+
 	
 	public void deleteBook(int id) {
 	    String sql = "DELETE FROM books WHERE id = ?";

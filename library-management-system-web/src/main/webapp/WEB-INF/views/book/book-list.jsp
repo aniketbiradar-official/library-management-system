@@ -34,6 +34,16 @@
             	<td>${book.totalCopies}</td>
             	<td>${book.availableCopies}</td>
             	<td>${book.category}</td>
+            	<td>
+                	<a href="${pageContext.request.contextPath}/books/edit?id=${book.id}">
+                    	Edit
+                	</a>
+                	|
+                	<a href="${pageContext.request.contextPath}/books/delete?id=${book.id}"
+                   		onclick="return confirm('Are you sure you want to delete this book?');">
+                    	Delete
+                </a>
+            </td>
         	</tr>
         </c:forEach>
         
