@@ -6,6 +6,10 @@
 <head>
 <meta charset="UTF-8">
 <title>Book List</title>
+<style>
+    form { margin-top: 5px; }
+</style>
+
 </head>
 <body>
 	<h2>Library Books</h2>
