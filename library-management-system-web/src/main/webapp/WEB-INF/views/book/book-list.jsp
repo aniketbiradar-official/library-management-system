@@ -15,6 +15,9 @@
 	<h2>Library Books</h2>
 	
 	<a href="${pageContext.request.contextPath}/books/add">Add New Book</a>
+	| 
+	<a href="${pageContext.request.contextPath}/loans/list">View Issued Books</a>
+	
 	<br/><br/>
 	
 	<table border="1" cellpadding="8">

@@ -10,13 +10,14 @@ public class Loan {
 	private LocalDateTime issueDate;
 	private LocalDateTime returnDate;
 	private String status;
+	private String bookTitle;
 	
 	public Loan() {
 		super();
 	}
 
 	public Loan(int id, int bookId, String borrowerName, LocalDateTime issueDate, LocalDateTime returnDate,
-			String status) {
+			String status, String bookTitle) {
 		super();
 		this.id = id;
 		this.bookId = bookId;
@@ -24,6 +25,7 @@ public class Loan {
 		this.issueDate = issueDate;
 		this.returnDate = returnDate;
 		this.status = status;
+		this.bookTitle = bookTitle;
 	}
 
 	public int getId() {
@@ -72,6 +74,14 @@ public class Loan {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	
+	public String getBookTitle() {
+	    return bookTitle;
+	}
+
+	public void setBookTitle(String bookTitle) {
+	    this.bookTitle = bookTitle;
 	}
 	
 	

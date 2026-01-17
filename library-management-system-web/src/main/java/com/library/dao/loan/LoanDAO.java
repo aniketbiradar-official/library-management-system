@@ -2,8 +2,12 @@ package com.library.dao.loan;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.library.model.loan.Loan;
 import com.library.util.DBConnectionUtil;
 
 public class LoanDAO {
@@ -68,4 +72,34 @@ public class LoanDAO {
             throw new RuntimeException("Error returning book", e);
         }
     }
+    
+    public List<Loan> getActiveLoans() {
+        List<Loan> loans = new ArrayList<>();
+
+        String sql = "SELECT l.id, l.book_id, b.title, l.borrower_name, l.issue_date " +
+                     "FROM book_loans l " +
+                     "JOIN books b ON l.book_id = b.id " +
+                     "WHERE l.status = 'ISSUED'";
+
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Loan loan = new Loan();
+                loan.setId(rs.getInt("id"));
+                loan.setBookId(rs.getInt("book_id"));
+                loan.setBookTitle(rs.getString("title"));
+                loan.setBorrowerName(rs.getString("borrower_name"));
+                loan.setIssueDate(rs.getTimestamp("issue_date").toLocalDateTime());
+
+                loans.add(loan);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching active loans", e);
+        }
+
+        return loans;
+    }
+
 }
