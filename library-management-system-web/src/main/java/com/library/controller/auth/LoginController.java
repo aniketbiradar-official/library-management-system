@@ -26,8 +26,17 @@ public class LoginController extends HttpServlet {
 		User user = authService.login(username, password);
 		
 		if (user != null) {
-			HttpSession session = req.getSession();
-			session.setAttribute("user", user);
+			// Invalidate old session if exists
+			HttpSession oldSession = req.getSession(false);
+			if (oldSession != null) {
+			    oldSession.invalidate();
+			}
+
+			// Create new session
+			HttpSession newSession = req.getSession(true);
+			newSession.setAttribute("user", user);
+			newSession.setMaxInactiveInterval(30 * 60); // 30 minutes
+
 			resp.sendRedirect(req.getContextPath() + "/books");
 		}
 		else {
