@@ -14,9 +14,13 @@
 <body>
 	<h2>Library Books</h2>
 	
-	<a href="${pageContext.request.contextPath}/books/add">Add New Book</a>
-	| 
+	<c:if test="${sessionScope.user.role == 'ADMIN'}">
+    	<a href="${pageContext.request.contextPath}/books/add">Add New Book</a>
+    	|
+	</c:if>
+
 	<a href="${pageContext.request.contextPath}/loans/list">View Issued Books</a>
+
 	
 	<br/><br/>
 	
@@ -42,17 +46,21 @@
             	<td>${book.availableCopies}</td>
             	<td>${book.category}</td>
             	<td>
-    				<a href="${pageContext.request.contextPath}/books/edit?id=${book.id}">
-        				Edit
-    				</a>
-    				|
-    				<a href="${pageContext.request.contextPath}/books/delete?id=${book.id}"
-       					onclick="return confirm('Are you sure you want to delete this book?');">
-        				Delete
-    				</a>
 
-    				<br/><br/>
+    				<!-- ADMIN actions -->
+    				<c:if test="${sessionScope.user.role == 'ADMIN'}">
+        				<a href="${pageContext.request.contextPath}/books/edit?id=${book.id}">
+            				Edit
+        				</a>
+        				|
+        				<a href="${pageContext.request.contextPath}/books/delete?id=${book.id}"
+           					onclick="return confirm('Are you sure you want to delete this book?');">
+            				Delete
+        				</a>
+        				<br/><br/>
+    				</c:if>
 
+    				<!-- Issue book -->
     				<c:if test="${book.availableCopies > 0}">
         				<form action="${pageContext.request.contextPath}/loans"
               				method="post"
@@ -73,6 +81,7 @@
     				<c:if test="${book.availableCopies == 0}">
         				<span style="color:red;">Not Available</span>
     				</c:if>
+
 				</td>
 
         	</tr>
