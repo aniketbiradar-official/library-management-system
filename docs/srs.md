@@ -1,296 +1,84 @@
-\# Software Requirements Specification (SRS)
-
-\## Library Management System
-
-
+# Software Requirements Specification (SRS)
+## Library Management System
 
 ---
 
+## 1. Introduction
 
+The Library Management System is a web-based application developed using Java Servlets, JSP, JDBC, and MySQL.  
+The system is designed to manage library operations such as maintaining a book catalog, issuing and returning books, and managing user access through roles.
 
-\## 1. Introduction
-
-
-
-\### 1.1 Purpose
-
-This document specifies the software requirements for the Library Management System (LMS). It serves as a reference for developers, testers, and stakeholders involved in the project.
-
-
+This project follows industry-standard MVC architecture and is intended for educational and practical full-stack Java development.
 
 ---
 
+## 2. User Roles
 
+### 2.1 Admin
+- Add, edit, and delete books
+- View complete book inventory
+- View issued books and reports
+- Manage system-level operations
 
-\### 1.2 Scope
+### 2.2 Librarian
+- Issue books to borrowers
+- Return issued books
+- View available books and issued books
 
-The LMS is a Java-based web application that allows libraries to manage books, members, and borrowing operations efficiently using a centralized system.
-
-
-
----
-
-
-
-\### 1.3 Definitions
-
-\- LMS: Library Management System
-
-\- DAO: Data Access Object
-
-\- MVC: Model View Controller
-
-
+### 2.3 Member
+- View available books
+- View books issued to them (future enhancement)
 
 ---
 
+## 3. Functional Requirements
 
+### 3.1 Authentication
+- The system shall allow users to log in using username and password.
+- The system shall validate credentials securely using encrypted passwords.
+- The system shall maintain user sessions.
 
-\## 2. Overall Description
+### 3.2 Book Management
+- Admin shall be able to add new books.
+- Admin shall be able to edit existing book details.
+- Admin shall be able to delete books.
+- All users shall be able to view the book list.
 
+### 3.3 Loan Management
+- Librarian/Admin shall be able to issue books if copies are available.
+- Librarian/Admin shall be able to return issued books.
+- The system shall automatically update available copies.
 
-
-\### 2.1 Product Perspective
-
-The system is a standalone web application developed using Java Servlets, JSP, JDBC, and MySQL. It follows MVC architecture to ensure separation of concerns.
-
-
-
----
-
-
-
-\### 2.2 Product Functions
-
-\- User authentication and authorization
-
-\- Book catalog management
-
-\- Borrowing and returning books
-
-\- User management
-
-\- Reporting and monitoring
-
-
+### 3.4 Authorization
+- The system shall restrict actions based on user roles.
+- Unauthorized users shall not access protected resources.
 
 ---
 
+## 4. Non-Functional Requirements
 
+### 4.1 Performance
+- The system should handle multiple users efficiently.
+- Database queries should be optimized using indexes.
 
-\### 2.3 User Classes
+### 4.2 Security
+- Passwords must be stored using secure hashing (BCrypt).
+- Session-based authentication must be enforced.
+- Role-based authorization must be applied.
 
-| User		| Description 				|
+### 4.3 Usability
+- The UI should be simple and easy to navigate.
+- Error messages should be user-friendly.
 
-|---------------|---------------------------------------|
-
-| Admin 	| System administrator with full access |
-
-| Librarian 	| Manages daily library operations 	|
-
-| Member 	| End user who borrows books 		|
-
-
-
----
-
-
-
-\### 2.4 Operating Environment
-
-\- Server: Apache Tomcat
-
-\- Database: MySQL
-
-\- Client: Web browser
-
-\- OS: Windows / Linux / macOS
-
-
+### 4.4 Maintainability
+- The system should follow clean code principles.
+- Code should be modular and well-documented.
 
 ---
 
-
-
-\## 3. Functional Requirements
-
-
-
-\### FR-01: User Login
-
-\- The system shall authenticate users using username and password.
-
-\- The system shall redirect users based on role.
-
-
-
----
-
-
-
-\### FR-02: Book Management
-
-\- The system shall allow adding, updating, and deleting books.
-
-\- The system shall maintain book availability.
-
-
-
----
-
-
-
-\### FR-03: Search Books
-
-\- The system shall allow users to search books by multiple attributes.
-
-
-
----
-
-
-
-\### FR-04: Borrow and Return
-
-\- The system shall allow members to borrow available books.
-
-\- The system shall update inventory on return.
-
-
-
----
-
-
-
-\### FR-05: User Management
-
-\- The system shall allow Admin to manage users.
-
-
-
----
-
-
-
-\## 4. Non-Functional Requirements
-
-
-
-\### NFR-01: Security
-
-\- The system shall prevent SQL Injection.
-
-\- The system shall enforce role-based access.
-
-
-
----
-
-
-
-\### NFR-02: Performance
-
-\- The system shall respond to requests within acceptable time limits.
-
-
-
----
-
-
-
-\### NFR-03: Reliability
-
-\- The system shall maintain data consistency during failures.
-
-
-
----
-
-
-
-\### NFR-04: Maintainability
-
-\- The system shall follow coding standards.
-
-\- The system shall be easy to extend.
-
-
-
----
-
-
-
-\## 5. External Interface Requirements
-
-
-
-\### 5.1 User Interface
-
-\- Web-based UI using HTML, CSS, and JSP.
-
-\- Consistent header and footer across pages.
-
-
-
----
-
-
-
-\### 5.2 Hardware Interfaces
-
-\- None
-
-
-
----
-
-
-
-\### 5.3 Software Interfaces
-
-\- MySQL database
-
-\- JDBC driver
-
-
-
----
-
-
-
-\## 6. Constraints
-
-\- Java 8+
-
-\- Apache Tomcat
-
-\- MySQL
-
-
-
----
-
-
-
-\## 7. Future Enhancements
-
-\- Email notifications
-
-\- Fine calculation
-
-\- REST API integration
-
-\- Mobile application
-
-
-
----
-
-
-
-\## 8. Approval
-
-This SRS document serves as the baseline agreement for system development.
-
-
-
+## 5. Constraints
+
+- The application uses Java Servlets and JSP (no Spring framework).
+- MySQL is used as the database.
+- The system is deployed on Apache Tomcat.
+- The project is intended for learning and demonstration purposes.
