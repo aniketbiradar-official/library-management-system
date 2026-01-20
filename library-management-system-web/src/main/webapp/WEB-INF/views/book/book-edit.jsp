@@ -10,6 +10,11 @@
 <body>
 	<h2>Edit Book</h2>
 	
+	<c:if test="${not empty error}">
+    	<p style="color:red">${error}</p>
+	</c:if>
+	
+	
 	<form method="post" action="${pageContext.request.contextPath}/books/edit">
 
     	<input type="hidden" name="id" value="${book.id}" />

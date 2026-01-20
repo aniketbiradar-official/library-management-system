@@ -19,19 +19,19 @@
 	<form method="post" action="${pageContext.request.contextPath}/books/add">
 		
 		<label>Title:</label>
-		<input type="text" name="title" required /> <br/> <br/>
+		<input type="text" name="title" value="${title}" required /> <br/> <br/>
 		
 		<label>Author:</label>
-		<input type="text" name="author" required /> <br/> <br/>
+		<input type="text" name="author" value="${author}" required /> <br/> <br/>
 		
 		<label>ISBN:</label>
-		<input type="text" name="isbn" required /> <br/> <br/>
+		<input type="text" name="isbn" value="${isbn}" required /> <br/> <br/>
 		
 		<label>Total Copies:</label>
-		<input type="number" name="totalCopies" required /> <br/> <br/>
+		<input type="number" name="totalCopies" value="${totalCopies}" required /> <br/> <br/>
 		
 		<label>Category:</label>
-		<input type="text" name="category" required /> <br/> <br/>
+		<input type="text" name="category" value="${category}" required /> <br/> <br/>
 		
 		<button type="submit">Add Book</button>
 		
