@@ -30,7 +30,7 @@ public class AuthFilter implements Filter {
         String uri = req.getRequestURI();
 
         // Allow login resources
-        if (uri.endsWith("login.jsp") || uri.endsWith("/login")) {
+        if (uri.endsWith("/login")) {
             chain.doFilter(request, response);
             return;
         }

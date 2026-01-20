@@ -41,7 +41,7 @@ public class LoginController extends HttpServlet {
 		}
 		else {
 			req.setAttribute("error", "Invalid username or password");
-			req.getRequestDispatcher("/login.jsp").forward(req, resp);
+			req.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(req, resp);
 		}
 	}
 }

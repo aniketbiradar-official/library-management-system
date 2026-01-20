@@ -20,7 +20,7 @@ public class LoanController extends HttpServlet {
 
         List<Loan> loans = loanDAO.getActiveLoans();
         req.setAttribute("loans", loans);
-        req.getRequestDispatcher("/WEB-INF/jsp/loan-list.jsp")
+        req.getRequestDispatcher("/WEB-INF/views/loan/loan-list.jsp")
            .forward(req, resp);
     }
 
