@@ -28,22 +28,32 @@ public class AuthFilter implements Filter {
         HttpServletResponse resp = (HttpServletResponse) response;
 
         String uri = req.getRequestURI();
+        String contextPath = req.getContextPath();
 
-        // Allow login resources
-        if (uri.endsWith("/login")) {
+        // ✅ Always allow login controller (GET + POST)
+        if (uri.equals(contextPath + "/login")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        // ✅ Allow static resources (safe)
+        if (uri.startsWith(contextPath + "/css") ||
+            uri.startsWith(contextPath + "/js") ||
+            uri.startsWith(contextPath + "/images")) {
             chain.doFilter(request, response);
             return;
         }
 
         HttpSession session = req.getSession(false);
-        User user = (session != null) ? (User) session.getAttribute("user") : null;
+        User user = (session != null)
+                ? (User) session.getAttribute("user")
+                : null;
 
         if (user == null) {
-            resp.sendRedirect(req.getContextPath() + "/login.jsp");
+            resp.sendRedirect(contextPath + "/login");
             return;
         }
 
         chain.doFilter(request, response);
-        
     }
 }

@@ -14,34 +14,44 @@ import com.library.service.auth.AuthService;
 
 @WebServlet("/login")
 public class LoginController extends HttpServlet {
-	
-	private final AuthService authService = new AuthService();
-	
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-		
-		String username = req.getParameter("username");
-		String password = req.getParameter("password");
-		
-		User user = authService.login(username, password);
-		
-		if (user != null) {
-			// Invalidate old session if exists
-			HttpSession oldSession = req.getSession(false);
-			if (oldSession != null) {
-			    oldSession.invalidate();
-			}
 
-			// Create new session
-			HttpSession newSession = req.getSession(true);
-			newSession.setAttribute("user", user);
-			newSession.setMaxInactiveInterval(30 * 60); // 30 minutes
+    private final AuthService authService = new AuthService();
 
-			resp.sendRedirect(req.getContextPath() + "/books");
-		}
-		else {
-			req.setAttribute("error", "Invalid username or password");
-			req.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(req, resp);
-		}
-	}
+    // SHOW LOGIN PAGE
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException, ServletException {
+
+        req.getRequestDispatcher("/WEB-INF/views/auth/login.jsp")
+           .forward(req, resp);
+    }
+
+    // HANDLE LOGIN SUBMIT
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException, ServletException {
+
+        String username = req.getParameter("username");
+        String password = req.getParameter("password");
+
+        User user = authService.login(username, password);
+
+        if (user != null) {
+            // invalidate old session
+            HttpSession oldSession = req.getSession(false);
+            if (oldSession != null) {
+                oldSession.invalidate();
+            }
+
+            HttpSession session = req.getSession(true);
+            session.setAttribute("user", user);
+            session.setMaxInactiveInterval(30 * 60);
+
+            resp.sendRedirect(req.getContextPath() + "/books");
+        } else {
+            req.setAttribute("error", "Invalid username or password");
+            req.getRequestDispatcher("/WEB-INF/views/auth/login.jsp")
+               .forward(req, resp);
+        }
+    }
 }

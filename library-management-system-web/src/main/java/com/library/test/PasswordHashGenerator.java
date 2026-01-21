@@ -9,5 +9,7 @@ public class PasswordHashGenerator {
         System.out.println(hashed);
         String hashed1 = PasswordUtil.hashPassword("librarian123");
         System.out.println(hashed1);
+        String hashed2 = PasswordUtil.hashPassword("member123");
+        System.out.println(hashed2);
     }
 }
