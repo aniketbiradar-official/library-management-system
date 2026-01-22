@@ -8,41 +8,56 @@ import java.util.List;
 
 import com.library.dao.loan.LoanDAO;
 import com.library.model.loan.Loan;
+import com.library.model.user.User;
+import com.library.service.loan.LoanService;
 
-@WebServlet({"/loans", "/loans/list"})
+@WebServlet("/loans/*")
 public class LoanController extends HttpServlet {
 
-    private final LoanDAO loanDAO = new LoanDAO();
-    
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-
-        List<Loan> loans = loanDAO.getActiveLoans();
-        req.setAttribute("loans", loans);
-        req.getRequestDispatcher("/WEB-INF/views/loan/loan-list.jsp")
-           .forward(req, resp);
-    }
-
+    private final LoanService loanService = new LoanService();
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws IOException {
 
-        String action = req.getParameter("action");
+        HttpSession session = req.getSession(false);
+        User user = (User) session.getAttribute("user");
 
-        if ("issue".equals(action)) {
+        String path = req.getPathInfo();
+
+        if ("/borrow".equals(path) && "MEMBER".equals(user.getRole())) {
             int bookId = Integer.parseInt(req.getParameter("bookId"));
-            String borrower = req.getParameter("borrowerName");
-            loanDAO.issueBook(bookId, borrower);
+            loanService.issueBook(bookId, user.getId());
         }
 
-        if ("return".equals(action)) {
-            int loanId = Integer.parseInt(req.getParameter("loanId"));
+        if ("/issue".equals(path) && "LIBRARIAN".equals(user.getRole())) {
             int bookId = Integer.parseInt(req.getParameter("bookId"));
-            loanDAO.returnBook(loanId, bookId);
+            int memberId = Integer.parseInt(req.getParameter("userId"));
+            loanService.issueBook(bookId, memberId);
+        }
+
+        if ("/return".equals(path)) {
+            int loanId = Integer.parseInt(req.getParameter("loanId"));
+            loanService.returnBook(loanId);
         }
 
         resp.sendRedirect(req.getContextPath() + "/books");
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException, ServletException {
+
+        HttpSession session = req.getSession(false);
+        User user = (User) session.getAttribute("user");
+
+        if ("MEMBER".equals(user.getRole())) {
+            req.setAttribute("loans", loanService.getLoansByUser(user.getId()));
+        } else {
+            req.setAttribute("loans", loanService.getAllActiveLoans());
+        }
+
+        req.getRequestDispatcher("/WEB-INF/views/loan/loan-list.jsp")
+           .forward(req, resp);
     }
 }

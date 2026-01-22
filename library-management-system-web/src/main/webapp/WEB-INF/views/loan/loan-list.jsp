@@ -17,7 +17,7 @@
     	<tr>
         	<th>Loan ID</th>
         	<th>Book</th>
-        	<th>Borrower</th>
+        	<th>User</th>
         	<th>Issued On</th>
         	<th>Action</th>
     	</tr>
@@ -26,7 +26,7 @@
         	<tr>
             	<td>${loan.id}</td>
             	<td>${loan.bookTitle}</td>
-            	<td>${loan.borrowerName}</td>
+            	<td>${loan.username}</td>
             	<td>${loan.issueDate}</td>
             	<td>
                 	<form action="${pageContext.request.contextPath}/loans"
