@@ -36,7 +36,7 @@ public class LoanController extends HttpServlet {
             loanService.issueBook(bookId, memberId);
         }
 
-        if ("/return".equals(path)) {
+        if ("/return".equals(path) && "LIBRARIAN".equals(user.getRole())) {
             int loanId = Integer.parseInt(req.getParameter("loanId"));
             loanService.returnBook(loanId);
         }

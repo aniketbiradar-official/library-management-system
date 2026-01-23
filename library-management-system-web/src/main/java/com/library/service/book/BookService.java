@@ -30,5 +30,15 @@ public class BookService {
 	public void deleteBook(int id) {
 	    bookDAO.deleteBook(id);
 	}
+	
+	public List<Book> searchBooks(String q, String category, String availability) {
+	    return bookDAO.searchBooks(q, category, availability);
+	}
+	
+	public List<String> getAllCategories() {
+	    return bookDAO.getAllCategories();
+	}
+
+
 
 }

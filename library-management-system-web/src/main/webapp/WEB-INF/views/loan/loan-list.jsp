@@ -29,13 +29,11 @@
             	<td>${loan.username}</td>
             	<td>${loan.issueDate}</td>
             	<td>
-                	<form action="${pageContext.request.contextPath}/loans"
-                      	method="post">
-                    	<input type="hidden" name="action" value="return"/>
-                    	<input type="hidden" name="loanId" value="${loan.id}"/>
-                    	<input type="hidden" name="bookId" value="${loan.bookId}"/>
-                    	<button type="submit">Return</button>
-                	</form>
+                	<form action="${pageContext.request.contextPath}/loans/return" method="post">
+					    <input type="hidden" name="loanId" value="${loan.id}" />
+					    <button type="submit">Return</button>
+					</form>
+
             	</td>
         	</tr>
     	</c:forEach>

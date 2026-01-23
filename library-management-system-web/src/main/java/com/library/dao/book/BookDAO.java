@@ -153,4 +153,82 @@ public class BookDAO {
             throw new RuntimeException("Error deleting book", e);
         }
     }
+    
+    public List<Book> searchBooks(String q, String category, String availability) {
+
+        List<Book> books = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder(
+            "SELECT * FROM books WHERE 1=1"
+        );
+
+        List<Object> params = new ArrayList<>();
+
+        if (q != null && !q.trim().isEmpty()) {
+            sql.append(" AND (title LIKE ? OR author LIKE ?)");
+            params.add("%" + q + "%");
+            params.add("%" + q + "%");
+        }
+
+        if (category != null && !category.trim().isEmpty()) {
+            sql.append(" AND category = ?");
+            params.add(category);
+        }
+
+        if ("available".equals(availability)) {
+            sql.append(" AND available_copies > 0");
+        } else if ("unavailable".equals(availability)) {
+            sql.append(" AND available_copies = 0");
+        }
+
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Book book = new Book();
+                book.setId(rs.getInt("id"));
+                book.setTitle(rs.getString("title"));
+                book.setAuthor(rs.getString("author"));
+                book.setIsbn(rs.getString("isbn"));
+                book.setTotalCopies(rs.getInt("total_copies"));
+                book.setAvailableCopies(rs.getInt("available_copies"));
+                book.setCategory(rs.getString("category"));
+                books.add(book);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error searching books", e);
+        }
+
+        return books;
+    }
+    
+    public List<String> getAllCategories() {
+
+        List<String> categories = new ArrayList<>();
+
+        String sql = "SELECT DISTINCT category FROM books WHERE category IS NOT NULL";
+
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                categories.add(rs.getString("category"));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching categories", e);
+        }
+
+        return categories;
+    }
+
+
 }

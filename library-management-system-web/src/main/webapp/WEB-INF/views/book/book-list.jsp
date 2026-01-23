@@ -17,6 +17,35 @@
 
 <h2>Library Books</h2>
 
+<form method="get" action="${pageContext.request.contextPath}/books">
+    <input type="text" name="q"
+           placeholder="Search by title or author"
+           value="${param.q}" />
+
+    <select name="category">
+    	<option value="">All Categories</option>
+
+    	<c:forEach var="cat" items="${categories}">
+	        <option value="${cat}"
+	            <c:if test="${param.category == cat}">selected</c:if>>
+	            ${cat}
+	        </option>
+	    </c:forEach>
+	</select>
+
+
+    <select name="availability">
+        <option value="">All</option>
+        <option value="available">Available</option>
+        <option value="unavailable">Unavailable</option>
+    </select>
+
+    <button type="submit">Search</button>
+</form>
+
+<br/>
+
+
 <c:if test="${sessionScope.user.role == 'ADMIN'}">
     <a href="${pageContext.request.contextPath}/books/add">Add New Book</a>
 </c:if>

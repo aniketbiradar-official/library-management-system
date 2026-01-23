@@ -72,8 +72,16 @@ public class BookController extends HttpServlet {
     private void listBooks(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        List<Book> books = bookService.getAllBooks();
+    	String q = request.getParameter("q");
+    	String category = request.getParameter("category");
+    	String availability = request.getParameter("availability");
+
+    	List<Book> books = bookService.searchBooks(q, category, availability);
+    	List<String> categories = bookService.getAllCategories();
+
         request.setAttribute("books", books);
+        request.setAttribute("categories", categories);
+        
         request.getRequestDispatcher("/WEB-INF/views/book/book-list.jsp")
                .forward(request, response);
     }
