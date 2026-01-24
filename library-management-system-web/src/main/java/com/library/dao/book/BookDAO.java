@@ -1,20 +1,20 @@
 package com.library.dao.book;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import com.library.model.Book;
 import com.library.util.DBConnectionUtil;
 
 public class BookDAO {
-	
-	private static final Set<String> ALLOWED_SORT_COLUMNS =
-	        Set.of("title", "author", "category");
 
+    // Whitelisted columns to prevent SQL injection
+    private static final Set<String> ALLOWED_SORT_COLUMNS =
+            Set.of("title", "author", "category");
 
+    // ================= CREATE =================
     public void addBook(Book book) {
+
         String sql = """
             INSERT INTO books
             (title, author, isbn, total_copies, available_copies, category)
@@ -40,34 +40,10 @@ public class BookDAO {
         }
     }
 
-    public List<Book> getAllBooks() {
-        List<Book> books = new ArrayList<>();
-        String sql = "SELECT * FROM books";
-
-        try (Connection conn = DBConnectionUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                Book book = new Book();
-                book.setId(rs.getInt("id"));
-                book.setTitle(rs.getString("title"));
-                book.setAuthor(rs.getString("author"));
-                book.setIsbn(rs.getString("isbn"));
-                book.setTotalCopies(rs.getInt("total_copies"));
-                book.setAvailableCopies(rs.getInt("available_copies"));
-                book.setCategory(rs.getString("category"));
-                books.add(book);
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error fetching books", e);
-        }
-        return books;
-    }
-
+    // ================= READ (SINGLE) =================
     public Book getBookById(int id) {
-        String sql = "SELECT * FROM books WHERE id=?";
+
+        String sql = "SELECT * FROM books WHERE id = ?";
 
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -76,40 +52,19 @@ public class BookDAO {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                Book book = new Book();
-                book.setId(id);
-                book.setTitle(rs.getString("title"));
-                book.setAuthor(rs.getString("author"));
-                book.setIsbn(rs.getString("isbn"));
-                book.setTotalCopies(rs.getInt("total_copies"));
-                book.setAvailableCopies(rs.getInt("available_copies"));
-                book.setCategory(rs.getString("category"));
-                return book;
+                return mapRow(rs);
             }
 
         } catch (SQLException e) {
             throw new RuntimeException("Error fetching book", e);
         }
+
         return null;
     }
 
-    private int getIssuedCopies(int bookId) throws SQLException {
-        String sql = "SELECT total_copies, available_copies FROM books WHERE id=?";
-
-        try (Connection conn = DBConnectionUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, bookId);
-            ResultSet rs = ps.executeQuery();
-
-            if (rs.next()) {
-                return rs.getInt("total_copies") - rs.getInt("available_copies");
-            }
-        }
-        return 0;
-    }
-
+    // ================= UPDATE =================
     public void updateBook(Book book) {
+
         String sql = """
             UPDATE books
             SET title=?, author=?, isbn=?, total_copies=?, available_copies=?, category=?
@@ -119,12 +74,12 @@ public class BookDAO {
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            int issuedCopies = getIssuedCopies(book.getId());
+            int issuedCopies = getIssuedCopies(book.getId(), conn);
             int newAvailable = book.getTotalCopies() - issuedCopies;
 
             if (newAvailable < 0) {
                 throw new RuntimeException(
-                    "Total copies cannot be less than already issued copies"
+                    "Total copies cannot be less than issued copies"
                 );
             }
 
@@ -145,7 +100,9 @@ public class BookDAO {
         }
     }
 
+    // ================= DELETE =================
     public void deleteBook(int id) {
+
         String sql = "DELETE FROM books WHERE id=?";
 
         try (Connection conn = DBConnectionUtil.getConnection();
@@ -158,7 +115,8 @@ public class BookDAO {
             throw new RuntimeException("Error deleting book", e);
         }
     }
-    
+
+    // ================= SEARCH + SORT + PAGINATION =================
     public List<Book> searchBooks(
             String q,
             String category,
@@ -168,14 +126,8 @@ public class BookDAO {
             int limit,
             int offset) {
 
-        List<Book> books = new ArrayList<>();
-
-        if (!ALLOWED_SORT_COLUMNS.contains(sort)) {
-            sort = "title";
-        }
-        if (!"asc".equalsIgnoreCase(order) && !"desc".equalsIgnoreCase(order)) {
-            order = "asc";
-        }
+        if (!ALLOWED_SORT_COLUMNS.contains(sort)) sort = "title";
+        order = "desc".equalsIgnoreCase(order) ? "desc" : "asc";
 
         StringBuilder sql = new StringBuilder(
                 "SELECT * FROM books WHERE 1=1"
@@ -205,6 +157,8 @@ public class BookDAO {
         params.add(limit);
         params.add(offset);
 
+        List<Book> books = new ArrayList<>();
+
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
 
@@ -214,15 +168,7 @@ public class BookDAO {
 
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                Book book = new Book();
-                book.setId(rs.getInt("id"));
-                book.setTitle(rs.getString("title"));
-                book.setAuthor(rs.getString("author"));
-                book.setIsbn(rs.getString("isbn"));
-                book.setTotalCopies(rs.getInt("total_copies"));
-                book.setAvailableCopies(rs.getInt("available_copies"));
-                book.setCategory(rs.getString("category"));
-                books.add(book);
+                books.add(mapRow(rs));
             }
 
         } catch (SQLException e) {
@@ -232,8 +178,49 @@ public class BookDAO {
         return books;
     }
 
+    // ================= COUNT =================
+    public int countBooks(String q, String category, String availability) {
 
-    
+        StringBuilder sql = new StringBuilder(
+            "SELECT COUNT(*) FROM books WHERE 1=1"
+        );
+
+        List<Object> params = new ArrayList<>();
+
+        if (q != null && !q.isBlank()) {
+            sql.append(" AND (title LIKE ? OR author LIKE ?)");
+            params.add("%" + q + "%");
+            params.add("%" + q + "%");
+        }
+
+        if (category != null && !category.isBlank()) {
+            sql.append(" AND category = ?");
+            params.add(category);
+        }
+
+        if ("available".equals(availability)) {
+            sql.append(" AND available_copies > 0");
+        } else if ("unavailable".equals(availability)) {
+            sql.append(" AND available_copies = 0");
+        }
+
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            return rs.getInt(1);
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error counting books", e);
+        }
+    }
+
+    // ================= HELPERS =================
     public List<String> getAllCategories() {
 
         List<String> categories = new ArrayList<>();
@@ -255,114 +242,24 @@ public class BookDAO {
         return categories;
     }
 
-    public int countBooks(String q, String category, String availability) {
+    private int getIssuedCopies(int bookId, Connection conn) throws SQLException {
 
-        StringBuilder sql = new StringBuilder(
-            "SELECT COUNT(*) FROM books WHERE 1=1"
-        );
+        String sql = "SELECT total_copies, available_copies FROM books WHERE id=?";
 
-        List<Object> params = new ArrayList<>();
-
-        if (q != null && !q.trim().isEmpty()) {
-            sql.append(" AND (title LIKE ? OR author LIKE ?)");
-            params.add("%" + q + "%");
-            params.add("%" + q + "%");
-        }
-
-        if (category != null && !category.trim().isEmpty()) {
-            sql.append(" AND category = ?");
-            params.add(category);
-        }
-
-        if ("available".equals(availability)) {
-            sql.append(" AND available_copies > 0");
-        } else if ("unavailable".equals(availability)) {
-            sql.append(" AND available_copies = 0");
-        }
-
-        try (Connection conn = DBConnectionUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-
-            for (int i = 0; i < params.size(); i++) {
-                ps.setObject(i + 1, params.get(i));
-            }
-
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, bookId);
             ResultSet rs = ps.executeQuery();
+
             if (rs.next()) {
-                return rs.getInt(1);
+                return rs.getInt("total_copies") - rs.getInt("available_copies");
             }
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error counting books", e);
         }
-
         return 0;
-    }
-    
-    public List<Book> findBooksPaged(
-            int offset,
-            int limit,
-            String sortBy,
-            String sortOrder
-    ) {
-
-        // Whitelist sorting columns (SECURITY)
-        if (!List.of("title", "author", "category").contains(sortBy)) {
-            sortBy = "title";
-        }
-
-        if (!"desc".equalsIgnoreCase(sortOrder)) {
-            sortOrder = "asc";
-        }
-
-        String sql = """
-            SELECT *
-            FROM books
-            ORDER BY %s %s
-            LIMIT ? OFFSET ?
-        """.formatted(sortBy, sortOrder);
-
-        List<Book> books = new ArrayList<>();
-
-        try (Connection conn = DBConnectionUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, limit);
-            ps.setInt(2, offset);
-
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                books.add(mapRow(rs)); // reuse mapper
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error fetching paginated books", e);
-        }
-
-        return books;
-    }
-
-    public int getTotalBookCount() {
-
-        String sql = "SELECT COUNT(*) FROM books";
-
-        try (Connection conn = DBConnectionUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-
-            rs.next();
-            return rs.getInt(1);
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error counting books", e);
-        }
     }
 
     private Book mapRow(ResultSet rs) throws SQLException {
 
         Book book = new Book();
-
         book.setId(rs.getInt("id"));
         book.setTitle(rs.getString("title"));
         book.setAuthor(rs.getString("author"));
@@ -370,9 +267,6 @@ public class BookDAO {
         book.setTotalCopies(rs.getInt("total_copies"));
         book.setAvailableCopies(rs.getInt("available_copies"));
         book.setCategory(rs.getString("category"));
-
         return book;
     }
-
-
 }
