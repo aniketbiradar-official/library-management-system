@@ -61,41 +61,29 @@
         <th>ID</th>
 
         <th>
-            <a href="?sort=title&order=asc
-                     &q=${param.q}&category=${param.category}&availability=${param.availability}">
-                Title ⬆
-            </a>
-            <a href="?sort=title&order=desc
-                     &q=${param.q}&category=${param.category}&availability=${param.availability}">
-                ⬇
-            </a>
-        </th>
+		    Title
+		    <a href="?sort=title&order=asc&q=${param.q}&category=${param.category}&availability=${param.availability}">⬆</a>
+		    <a href="?sort=title&order=desc&q=${param.q}&category=${param.category}&availability=${param.availability}">⬇</a>
+		</th>
+
 
         <th>
-            <a href="?sort=author&order=asc
-                     &q=${param.q}&category=${param.category}&availability=${param.availability}">
-                Author ⬆
-            </a>
-            <a href="?sort=author&order=desc
-                     &q=${param.q}&category=${param.category}&availability=${param.availability}">
-                ⬇
-            </a>
-        </th>
+		    Author
+		    <a href="?sort=author&order=asc&q=${param.q}&category=${param.category}&availability=${param.availability}">⬆</a>
+		    <a href="?sort=author&order=desc&q=${param.q}&category=${param.category}&availability=${param.availability}">⬇</a>
+		</th>
+
 
         <th>ISBN</th>
         <th>Total</th>
         <th>Available</th>
 
         <th>
-            <a href="?sort=category&order=asc
-                     &q=${param.q}&category=${param.category}&availability=${param.availability}">
-                Category ⬆
-            </a>
-            <a href="?sort=category&order=desc
-                     &q=${param.q}&category=${param.category}&availability=${param.availability}">
-                ⬇
-            </a>
-        </th>
+		    Category
+		    <a href="?sort=category&order=asc&q=${param.q}&category=${param.category}&availability=${param.availability}">⬆</a>
+		    <a href="?sort=category&order=desc&q=${param.q}&category=${param.category}&availability=${param.availability}">⬇</a>
+		</th>
+
 
         <th>Actions</th>
     </tr>
@@ -159,11 +147,11 @@
                 </c:when>
                 <c:otherwise>
                     <a href="?page=${i}
-                             &q=${param.q}
-                             &category=${param.category}
-                             &availability=${param.availability}
-                             &sort=${sort}
-                             &order=${order}">
+                        &q=${param.q}
+                        &category=${param.category}
+                        &availability=${param.availability}
+                        &sort=${sort}
+                        &order=${order}">
                         ${i}
                     </a>
                 </c:otherwise>
@@ -172,6 +160,8 @@
         </c:forEach>
     </div>
 </c:if>
+
+
 
 </body>
 </html>

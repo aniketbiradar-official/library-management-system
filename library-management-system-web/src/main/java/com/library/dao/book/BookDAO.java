@@ -3,11 +3,16 @@ package com.library.dao.book;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import com.library.model.Book;
 import com.library.util.DBConnectionUtil;
 
 public class BookDAO {
+	
+	private static final Set<String> ALLOWED_SORT_COLUMNS =
+	        Set.of("title", "author", "category");
+
 
     public void addBook(Book book) {
         String sql = """
@@ -154,23 +159,37 @@ public class BookDAO {
         }
     }
     
-    public List<Book> searchBooks(String q, String category, String availability, int limit, int offset) {
+    public List<Book> searchBooks(
+            String q,
+            String category,
+            String availability,
+            String sort,
+            String order,
+            int limit,
+            int offset) {
 
         List<Book> books = new ArrayList<>();
 
+        if (!ALLOWED_SORT_COLUMNS.contains(sort)) {
+            sort = "title";
+        }
+        if (!"asc".equalsIgnoreCase(order) && !"desc".equalsIgnoreCase(order)) {
+            order = "asc";
+        }
+
         StringBuilder sql = new StringBuilder(
-            "SELECT * FROM books WHERE 1=1"
+                "SELECT * FROM books WHERE 1=1"
         );
 
         List<Object> params = new ArrayList<>();
 
-        if (q != null && !q.trim().isEmpty()) {
+        if (q != null && !q.isBlank()) {
             sql.append(" AND (title LIKE ? OR author LIKE ?)");
             params.add("%" + q + "%");
             params.add("%" + q + "%");
         }
 
-        if (category != null && !category.trim().isEmpty()) {
+        if (category != null && !category.isBlank()) {
             sql.append(" AND category = ?");
             params.add(category);
         }
@@ -180,11 +199,11 @@ public class BookDAO {
         } else if ("unavailable".equals(availability)) {
             sql.append(" AND available_copies = 0");
         }
-        
+
+        sql.append(" ORDER BY ").append(sort).append(" ").append(order);
         sql.append(" LIMIT ? OFFSET ?");
         params.add(limit);
         params.add(offset);
-
 
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
@@ -194,7 +213,6 @@ public class BookDAO {
             }
 
             ResultSet rs = ps.executeQuery();
-
             while (rs.next()) {
                 Book book = new Book();
                 book.setId(rs.getInt("id"));
@@ -213,6 +231,8 @@ public class BookDAO {
 
         return books;
     }
+
+
     
     public List<String> getAllCategories() {
 
@@ -339,6 +359,20 @@ public class BookDAO {
         }
     }
 
+    private Book mapRow(ResultSet rs) throws SQLException {
+
+        Book book = new Book();
+
+        book.setId(rs.getInt("id"));
+        book.setTitle(rs.getString("title"));
+        book.setAuthor(rs.getString("author"));
+        book.setIsbn(rs.getString("isbn"));
+        book.setTotalCopies(rs.getInt("total_copies"));
+        book.setAvailableCopies(rs.getInt("available_copies"));
+        book.setCategory(rs.getString("category"));
+
+        return book;
+    }
 
 
 }

@@ -72,39 +72,37 @@ public class BookController extends HttpServlet {
     private void listBooks(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // ===== Read filters =====
         String q = request.getParameter("q");
         String category = request.getParameter("category");
         String availability = request.getParameter("availability");
 
-        // ===== Pagination =====
+        // ===== Pagination (SAFE) =====
         int page = 1;
-        if (request.getParameter("page") != null) {
-            page = Integer.parseInt(request.getParameter("page"));
+        String pageParam = request.getParameter("page");
+        if (pageParam != null) {
+            pageParam = pageParam.trim();
+            if (pageParam.matches("\\d+")) {
+                page = Integer.parseInt(pageParam);
+            }
         }
 
-        // ===== Sorting (UI support, safe defaults) =====
+        // ===== Sorting (SAFE DEFAULTS) =====
         String sort = request.getParameter("sort");
         String order = request.getParameter("order");
 
-        if (sort == null || sort.isBlank()) {
-            sort = "title";
-        }
-        if (order == null || order.isBlank()) {
-            order = "asc";
-        }
+        if (sort == null || sort.isBlank()) sort = "title";
+        if (order == null || order.isBlank()) order = "asc";
 
         // ===== Fetch data =====
-        List<Book> books =
-                bookService.searchBooks(q, category, availability, page);
+        List<Book> books = bookService.searchBooks(
+                q, category, availability, sort, order, page
+        );
 
-        int totalBooks =
-                bookService.countBooks(q, category, availability);
-
+        int totalBooks = bookService.countBooks(q, category, availability);
         int pageSize = bookService.getPageSize();
         int totalPages = (int) Math.ceil((double) totalBooks / pageSize);
 
-        // ===== Send to JSP =====
+        // ===== Attributes =====
         request.setAttribute("books", books);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
@@ -115,6 +113,8 @@ public class BookController extends HttpServlet {
         request.getRequestDispatcher("/WEB-INF/views/book/book-list.jsp")
                .forward(request, response);
     }
+
+
 
 
     private void showAddForm(HttpServletRequest request, HttpServletResponse response)

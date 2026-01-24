@@ -36,11 +36,16 @@ public class BookService {
 	        String q,
 	        String category,
 	        String availability,
+	        String sort,
+	        String order,
 	        int page) {
 
 	    int offset = (page - 1) * PAGE_SIZE;
-	    return bookDAO.searchBooks(q, category, availability, PAGE_SIZE, offset);
+	    return bookDAO.searchBooks(
+	            q, category, availability, sort, order, PAGE_SIZE, offset
+	    );
 	}
+
 	
 	public int countBooks(String q, String category, String availability) {
 	    return bookDAO.countBooks(q, category, availability);
