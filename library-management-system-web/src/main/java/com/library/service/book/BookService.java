@@ -54,6 +54,20 @@ public class BookService {
 	    return bookDAO.getAllCategories();
 	}
 
+	public List<Book> getBooksPaged(
+	        int page,
+	        int size,
+	        String sortBy,
+	        String sortOrder
+	) {
+	    int offset = (page - 1) * size;
+	    return bookDAO.findBooksPaged(offset, size, sortBy, sortOrder);
+	}
+
+	public int getTotalPages(int size) {
+	    int total = bookDAO.getTotalBookCount();
+	    return (int) Math.ceil((double) total / size);
+	}
 
 
 }

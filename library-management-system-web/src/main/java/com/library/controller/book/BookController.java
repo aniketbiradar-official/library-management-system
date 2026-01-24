@@ -68,37 +68,54 @@ public class BookController extends HttpServlet {
         }
     }
 
-    // ---------------- ACTIONS ----------------
+ // ---------------- ACTIONS ----------------
     private void listBooks(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-    	String q = request.getParameter("q");
-    	String category = request.getParameter("category");
-    	String availability = request.getParameter("availability");
+        // ===== Read filters =====
+        String q = request.getParameter("q");
+        String category = request.getParameter("category");
+        String availability = request.getParameter("availability");
 
-    	int page = 1;
-    	if (request.getParameter("page") != null) {
-    	    page = Integer.parseInt(request.getParameter("page"));
-    	}
+        // ===== Pagination =====
+        int page = 1;
+        if (request.getParameter("page") != null) {
+            page = Integer.parseInt(request.getParameter("page"));
+        }
 
-    	List<Book> books =
-    	        bookService.searchBooks(q, category, availability, page);
+        // ===== Sorting (UI support, safe defaults) =====
+        String sort = request.getParameter("sort");
+        String order = request.getParameter("order");
 
-    	int totalBooks =
-    	        bookService.countBooks(q, category, availability);
+        if (sort == null || sort.isBlank()) {
+            sort = "title";
+        }
+        if (order == null || order.isBlank()) {
+            order = "asc";
+        }
 
-    	int pageSize = bookService.getPageSize();
-    	int totalPages = (int) Math.ceil((double) totalBooks / pageSize);
+        // ===== Fetch data =====
+        List<Book> books =
+                bookService.searchBooks(q, category, availability, page);
 
-    	request.setAttribute("books", books);
-    	request.setAttribute("currentPage", page);
-    	request.setAttribute("totalPages", totalPages);
-    	request.setAttribute("categories", bookService.getAllCategories());
+        int totalBooks =
+                bookService.countBooks(q, category, availability);
 
-    	request.getRequestDispatcher("/WEB-INF/views/book/book-list.jsp")
-    	       .forward(request, response);
+        int pageSize = bookService.getPageSize();
+        int totalPages = (int) Math.ceil((double) totalBooks / pageSize);
 
+        // ===== Send to JSP =====
+        request.setAttribute("books", books);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("categories", bookService.getAllCategories());
+        request.setAttribute("sort", sort);
+        request.setAttribute("order", order);
+
+        request.getRequestDispatcher("/WEB-INF/views/book/book-list.jsp")
+               .forward(request, response);
     }
+
 
     private void showAddForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

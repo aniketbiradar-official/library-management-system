@@ -278,6 +278,67 @@ public class BookDAO {
 
         return 0;
     }
+    
+    public List<Book> findBooksPaged(
+            int offset,
+            int limit,
+            String sortBy,
+            String sortOrder
+    ) {
+
+        // Whitelist sorting columns (SECURITY)
+        if (!List.of("title", "author", "category").contains(sortBy)) {
+            sortBy = "title";
+        }
+
+        if (!"desc".equalsIgnoreCase(sortOrder)) {
+            sortOrder = "asc";
+        }
+
+        String sql = """
+            SELECT *
+            FROM books
+            ORDER BY %s %s
+            LIMIT ? OFFSET ?
+        """.formatted(sortBy, sortOrder);
+
+        List<Book> books = new ArrayList<>();
+
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, limit);
+            ps.setInt(2, offset);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                books.add(mapRow(rs)); // reuse mapper
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching paginated books", e);
+        }
+
+        return books;
+    }
+
+    public int getTotalBookCount() {
+
+        String sql = "SELECT COUNT(*) FROM books";
+
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            rs.next();
+            return rs.getInt(1);
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error counting books", e);
+        }
+    }
+
 
 
 }

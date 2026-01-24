@@ -1,15 +1,13 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Book List</title>
-<style>
-    form { margin: 0; }
-</style>
+    <title>Book List</title>
+    <style>
+        form { margin: 0; }
+    </style>
 </head>
 <body>
 
@@ -17,27 +15,33 @@
 
 <h2>Library Books</h2>
 
+<!-- ================= SEARCH & FILTER ================= -->
 <form method="get" action="${pageContext.request.contextPath}/books">
+
     <input type="text" name="q"
            placeholder="Search by title or author"
            value="${param.q}" />
 
     <select name="category">
-    	<option value="">All Categories</option>
-
-    	<c:forEach var="cat" items="${categories}">
-	        <option value="${cat}"
-	            <c:if test="${param.category == cat}">selected</c:if>>
-	            ${cat}
-	        </option>
-	    </c:forEach>
-	</select>
-
+        <option value="">All Categories</option>
+        <c:forEach var="cat" items="${categories}">
+            <option value="${cat}"
+                <c:if test="${param.category == cat}">selected</c:if>>
+                ${cat}
+            </option>
+        </c:forEach>
+    </select>
 
     <select name="availability">
         <option value="">All</option>
-        <option value="available">Available</option>
-        <option value="unavailable">Unavailable</option>
+        <option value="available"
+            <c:if test="${param.availability == 'available'}">selected</c:if>>
+            Available
+        </option>
+        <option value="unavailable"
+            <c:if test="${param.availability == 'unavailable'}">selected</c:if>>
+            Unavailable
+        </option>
     </select>
 
     <button type="submit">Search</button>
@@ -45,22 +49,54 @@
 
 <br/>
 
-
 <c:if test="${sessionScope.user.role == 'ADMIN'}">
     <a href="${pageContext.request.contextPath}/books/add">Add New Book</a>
 </c:if>
 
 <br/><br/>
 
+<!-- ================= BOOK TABLE ================= -->
 <table border="1" cellpadding="8">
     <tr>
         <th>ID</th>
-        <th>Title</th>
-        <th>Author</th>
+
+        <th>
+            <a href="?sort=title&order=asc
+                     &q=${param.q}&category=${param.category}&availability=${param.availability}">
+                Title ⬆
+            </a>
+            <a href="?sort=title&order=desc
+                     &q=${param.q}&category=${param.category}&availability=${param.availability}">
+                ⬇
+            </a>
+        </th>
+
+        <th>
+            <a href="?sort=author&order=asc
+                     &q=${param.q}&category=${param.category}&availability=${param.availability}">
+                Author ⬆
+            </a>
+            <a href="?sort=author&order=desc
+                     &q=${param.q}&category=${param.category}&availability=${param.availability}">
+                ⬇
+            </a>
+        </th>
+
         <th>ISBN</th>
         <th>Total</th>
         <th>Available</th>
-        <th>Category</th>
+
+        <th>
+            <a href="?sort=category&order=asc
+                     &q=${param.q}&category=${param.category}&availability=${param.availability}">
+                Category ⬆
+            </a>
+            <a href="?sort=category&order=desc
+                     &q=${param.q}&category=${param.category}&availability=${param.availability}">
+                ⬇
+            </a>
+        </th>
+
         <th>Actions</th>
     </tr>
 
@@ -77,8 +113,7 @@
 
                 <!-- ADMIN -->
                 <c:if test="${sessionScope.user.role == 'ADMIN'}">
-                    <a href="${pageContext.request.contextPath}/books/edit?id=${book.id}">Edit</a>
-                    |
+                    <a href="${pageContext.request.contextPath}/books/edit?id=${book.id}">Edit</a> |
                     <a href="${pageContext.request.contextPath}/books/delete?id=${book.id}"
                        onclick="return confirm('Delete this book?');">Delete</a>
                 </c:if>
@@ -114,6 +149,7 @@
 
 <br/>
 
+<!-- ================= PAGINATION ================= -->
 <c:if test="${totalPages > 1}">
     <div>
         <c:forEach begin="1" end="${totalPages}" var="i">
@@ -122,7 +158,12 @@
                     <strong>[${i}]</strong>
                 </c:when>
                 <c:otherwise>
-                    <a href="?page=${i}&q=${param.q}&category=${param.category}&availability=${param.availability}">
+                    <a href="?page=${i}
+                             &q=${param.q}
+                             &category=${param.category}
+                             &availability=${param.availability}
+                             &sort=${sort}
+                             &order=${order}">
                         ${i}
                     </a>
                 </c:otherwise>
@@ -131,7 +172,6 @@
         </c:forEach>
     </div>
 </c:if>
-
 
 </body>
 </html>
