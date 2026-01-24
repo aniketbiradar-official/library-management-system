@@ -76,14 +76,28 @@ public class BookController extends HttpServlet {
     	String category = request.getParameter("category");
     	String availability = request.getParameter("availability");
 
-    	List<Book> books = bookService.searchBooks(q, category, availability);
-    	List<String> categories = bookService.getAllCategories();
+    	int page = 1;
+    	if (request.getParameter("page") != null) {
+    	    page = Integer.parseInt(request.getParameter("page"));
+    	}
 
-        request.setAttribute("books", books);
-        request.setAttribute("categories", categories);
-        
-        request.getRequestDispatcher("/WEB-INF/views/book/book-list.jsp")
-               .forward(request, response);
+    	List<Book> books =
+    	        bookService.searchBooks(q, category, availability, page);
+
+    	int totalBooks =
+    	        bookService.countBooks(q, category, availability);
+
+    	int pageSize = bookService.getPageSize();
+    	int totalPages = (int) Math.ceil((double) totalBooks / pageSize);
+
+    	request.setAttribute("books", books);
+    	request.setAttribute("currentPage", page);
+    	request.setAttribute("totalPages", totalPages);
+    	request.setAttribute("categories", bookService.getAllCategories());
+
+    	request.getRequestDispatcher("/WEB-INF/views/book/book-list.jsp")
+    	       .forward(request, response);
+
     }
 
     private void showAddForm(HttpServletRequest request, HttpServletResponse response)

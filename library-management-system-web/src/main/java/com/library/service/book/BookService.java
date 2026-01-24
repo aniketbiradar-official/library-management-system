@@ -8,6 +8,7 @@ import com.library.model.Book;
 public class BookService {
 
 	private final BookDAO bookDAO = new BookDAO();
+	private static final int PAGE_SIZE = 5;
 	
 	public void addBook(Book book) {
 		
@@ -31,8 +32,22 @@ public class BookService {
 	    bookDAO.deleteBook(id);
 	}
 	
-	public List<Book> searchBooks(String q, String category, String availability) {
-	    return bookDAO.searchBooks(q, category, availability);
+	public List<Book> searchBooks(
+	        String q,
+	        String category,
+	        String availability,
+	        int page) {
+
+	    int offset = (page - 1) * PAGE_SIZE;
+	    return bookDAO.searchBooks(q, category, availability, PAGE_SIZE, offset);
+	}
+	
+	public int countBooks(String q, String category, String availability) {
+	    return bookDAO.countBooks(q, category, availability);
+	}
+
+	public int getPageSize() {
+	    return PAGE_SIZE;
 	}
 	
 	public List<String> getAllCategories() {

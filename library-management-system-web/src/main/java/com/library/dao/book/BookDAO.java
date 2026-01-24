@@ -154,7 +154,7 @@ public class BookDAO {
         }
     }
     
-    public List<Book> searchBooks(String q, String category, String availability) {
+    public List<Book> searchBooks(String q, String category, String availability, int limit, int offset) {
 
         List<Book> books = new ArrayList<>();
 
@@ -180,6 +180,11 @@ public class BookDAO {
         } else if ("unavailable".equals(availability)) {
             sql.append(" AND available_copies = 0");
         }
+        
+        sql.append(" LIMIT ? OFFSET ?");
+        params.add(limit);
+        params.add(offset);
+
 
         try (Connection conn = DBConnectionUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql.toString())) {
@@ -228,6 +233,50 @@ public class BookDAO {
         }
 
         return categories;
+    }
+
+    public int countBooks(String q, String category, String availability) {
+
+        StringBuilder sql = new StringBuilder(
+            "SELECT COUNT(*) FROM books WHERE 1=1"
+        );
+
+        List<Object> params = new ArrayList<>();
+
+        if (q != null && !q.trim().isEmpty()) {
+            sql.append(" AND (title LIKE ? OR author LIKE ?)");
+            params.add("%" + q + "%");
+            params.add("%" + q + "%");
+        }
+
+        if (category != null && !category.trim().isEmpty()) {
+            sql.append(" AND category = ?");
+            params.add(category);
+        }
+
+        if ("available".equals(availability)) {
+            sql.append(" AND available_copies > 0");
+        } else if ("unavailable".equals(availability)) {
+            sql.append(" AND available_copies = 0");
+        }
+
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error counting books", e);
+        }
+
+        return 0;
     }
 
 

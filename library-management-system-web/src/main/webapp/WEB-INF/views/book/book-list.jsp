@@ -112,5 +112,26 @@
     </c:forEach>
 </table>
 
+<br/>
+
+<c:if test="${totalPages > 1}">
+    <div>
+        <c:forEach begin="1" end="${totalPages}" var="i">
+            <c:choose>
+                <c:when test="${i == currentPage}">
+                    <strong>[${i}]</strong>
+                </c:when>
+                <c:otherwise>
+                    <a href="?page=${i}&q=${param.q}&category=${param.category}&availability=${param.availability}">
+                        ${i}
+                    </a>
+                </c:otherwise>
+            </c:choose>
+            &nbsp;
+        </c:forEach>
+    </div>
+</c:if>
+
+
 </body>
 </html>
