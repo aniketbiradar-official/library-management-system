@@ -21,5 +21,10 @@
     	<br/><br/>
     	<button type="submit">Login</button>
 	</form>
+	<br/>
+<a href="${pageContext.request.contextPath}/register">
+    New member? Register here
+</a>
+	
 </body>
 </html>

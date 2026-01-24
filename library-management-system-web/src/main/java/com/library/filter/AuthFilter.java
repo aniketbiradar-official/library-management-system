@@ -35,6 +35,12 @@ public class AuthFilter implements Filter {
             chain.doFilter(request, response);
             return;
         }
+        
+        // ✅ Allow registration (GET + POST)
+        if (uri.equals(contextPath + "/register")) {
+            chain.doFilter(request, response);
+            return;
+        }
 
         // ✅ Allow static resources (safe)
         if (uri.startsWith(contextPath + "/css") ||
