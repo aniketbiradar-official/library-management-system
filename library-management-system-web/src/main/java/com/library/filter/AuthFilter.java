@@ -49,6 +49,15 @@ public class AuthFilter implements Filter {
             chain.doFilter(request, response);
             return;
         }
+        
+        // Allow reports for authenticated users
+        if (uri.startsWith(contextPath + "/reports") ||
+        	uri.startsWith(contextPath + "/js") ||
+            uri.startsWith(contextPath + "/images")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
 
         HttpSession session = req.getSession(false);
         User user = (session != null)
