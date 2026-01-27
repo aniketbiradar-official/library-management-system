@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.library.dao.report.ReportDAO;
 import com.library.model.report.IssuedBookReport;
+import com.library.model.report.OverdueBookReport;
 
 public class ReportService {
 
@@ -18,4 +19,9 @@ public class ReportService {
     public List<IssuedBookReport> getCurrentlyIssuedBooks() {
         return reportDAO.getCurrentlyIssuedBooks();
     }
+    
+    public List<OverdueBookReport> getOverdueBooks() {
+        return reportDAO.getOverdueBooks();
+    }
+
 }

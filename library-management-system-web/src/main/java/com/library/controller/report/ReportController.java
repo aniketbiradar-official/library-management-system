@@ -69,6 +69,16 @@ public class ReportController extends HttpServlet {
                 "/WEB-INF/views/report/currently-issued-books.jsp"
             ).forward(request, response);
 
+        } else if ("/overdue".equals(path)) {
+
+            request.setAttribute(
+                "reports",
+                reportService.getOverdueBooks()
+            );
+
+            request.getRequestDispatcher(
+                "/WEB-INF/views/report/overdue-books.jsp"
+            ).forward(request, response);
         } else {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
