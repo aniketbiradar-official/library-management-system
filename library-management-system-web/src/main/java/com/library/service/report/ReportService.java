@@ -3,6 +3,7 @@ package com.library.service.report;
 import java.util.List;
 
 import com.library.dao.report.ReportDAO;
+import com.library.model.report.CategoryReport;
 import com.library.model.report.IssuedBookReport;
 import com.library.model.report.MemberActivityReport;
 import com.library.model.report.MonthlyBorrowReport;
@@ -32,6 +33,10 @@ public class ReportService {
 
     public List<MonthlyBorrowReport> getMonthlyBorrowingTrends() {
         return reportDAO.getMonthlyBorrowingTrends();
+    }
+
+    public List<CategoryReport> getBooksByCategory() {
+        return reportDAO.getBooksByCategory();
     }
 
 }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.library.model.report.BookBorrowReport;
+import com.library.model.report.CategoryReport;
 import com.library.model.report.IssuedBookReport;
 import com.library.model.report.MemberActivityReport;
 import com.library.model.report.MonthlyBorrowReport;
@@ -186,6 +187,35 @@ public class ReportDAO {
 
         } catch (SQLException e) {
             throw new RuntimeException("Error fetching monthly borrowing trends", e);
+        }
+
+        return reports;
+    }
+    
+    public List<CategoryReport> getBooksByCategory() {
+
+        String sql = """
+            SELECT category, COUNT(*) AS total
+            FROM books
+            WHERE category IS NOT NULL
+            GROUP BY category
+        """;
+
+        List<CategoryReport> reports = new ArrayList<>();
+
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                CategoryReport r = new CategoryReport();
+                r.setCategory(rs.getString("category"));
+                r.setCount(rs.getInt("total"));
+                reports.add(r);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching books by category report", e);
         }
 
         return reports;

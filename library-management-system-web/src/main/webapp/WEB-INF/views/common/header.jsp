@@ -3,7 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <nav style="margin-bottom:15px;">
-    
+
     <!-- ================= COMMON ================= -->
     <a href="${pageContext.request.contextPath}/books">Books</a>
 
@@ -19,34 +19,43 @@
 
     <!-- ================= REPORTS (ADMIN + LIBRARIAN) ================= -->
     <c:if test="${sessionScope.user.role == 'ADMIN' || sessionScope.user.role == 'LIBRARIAN'}">
-        | <span>Reports:</span>
-        <a href="${pageContext.request.contextPath}/reports/books">
-            Most Borrowed Books
+        |
+        <strong>Reports:</strong>
+
+        <a href="${pageContext.request.contextPath}/reports/dashboard">
+            Dashboard
         </a>
         |
+
+        <a href="${pageContext.request.contextPath}/reports/books">
+            Most Borrowed
+        </a>
+        |
+
         <a href="${pageContext.request.contextPath}/reports/issued">
-            Currently Issued Books
+            Issued Books
+        </a>
+        |
+
+        <a href="${pageContext.request.contextPath}/reports/overdue">
+            Overdue
+        </a>
+        |
+
+        <a href="${pageContext.request.contextPath}/reports/members">
+            Member Activity
+        </a>
+        |
+
+        <a href="${pageContext.request.contextPath}/reports/monthly">
+            Monthly Trends
+        </a>
+        |
+
+        <a href="${pageContext.request.contextPath}/reports/categories">
+            Books by Category
         </a>
     </c:if>
-    
-    <c:if test="${sessionScope.user.role == 'ADMIN' || sessionScope.user.role == 'LIBRARIAN'}">
-	    | <a href="${pageContext.request.contextPath}/reports/overdue">
-	        Overdue Books
-	      </a>
-	</c:if>
-	
-	<c:if test="${sessionScope.user.role == 'ADMIN' || sessionScope.user.role == 'LIBRARIAN'}">
-	    | <a href="${pageContext.request.contextPath}/reports/members">
-	        Member Activity
-	      </a>
-	</c:if>
-	
-    <c:if test="${sessionScope.user.role == 'ADMIN' || sessionScope.user.role == 'LIBRARIAN'}">
-	    | <a href="${pageContext.request.contextPath}/reports/monthly">
-	        Monthly Borrowing Trends
-	      </a>
-	</c:if>
-    
 
     <!-- ================= LOGOUT ================= -->
     | <a href="${pageContext.request.contextPath}/logout">Logout</a>

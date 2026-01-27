@@ -4,38 +4,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Monthly Borrowing Trends</title>
+    <title>Books by Category</title>
 </head>
 <body>
 
 <jsp:include page="/WEB-INF/views/common/header.jsp"/>
 
-<h2>Monthly Borrowing Trends</h2>
+<h2>Books by Category</h2>
 
 <c:if test="${empty reports}">
-    <p>No borrowing data available.</p>
+    <p>No category data available.</p>
 </c:if>
 
 <c:if test="${not empty reports}">
 
-    <!-- ================= CHART ================= -->
-    <canvas id="monthlyChart" width="700" height="240"></canvas>
+    <!-- ================= PIE CHART ================= -->
+    <canvas id="categoryChart" width="420" height="220"></canvas>
 
     <br/><br/>
 
     <!-- ================= TABLE ================= -->
     <table border="1" cellpadding="8">
         <tr>
-            <th>Year</th>
-            <th>Month</th>
-            <th>Total Borrowed</th>
+            <th>Category</th>
+            <th>Total Books</th>
         </tr>
 
         <c:forEach var="r" items="${reports}">
             <tr>
-                <td>${r.year}</td>
-                <td>${r.month}</td>
-                <td>${r.totalBorrowed}</td>
+                <td>${r.category}</td>
+                <td>${r.count}</td>
             </tr>
         </c:forEach>
     </table>
@@ -51,37 +49,40 @@
 <script>
 const labels = [
 <c:forEach var="r" items="${reports}">
-    "${r.year}-${r.month}",
+    "${r.category}",
 </c:forEach>
 ];
 
 const dataValues = [
 <c:forEach var="r" items="${reports}">
-    ${r.totalBorrowed},
+    ${r.count},
 </c:forEach>
 ];
 
 new Chart(
-    document.getElementById('monthlyChart'),
+    document.getElementById('categoryChart'),
     {
-        type: 'line',
+        type: 'pie',
         data: {
             labels: labels,
             datasets: [{
-                label: 'Books Borrowed Per Month',
                 data: dataValues,
-                borderWidth: 2,
-                tension: 0.3,
-                fill: false
+                backgroundColor: [
+                    '#36A2EB',
+                    '#FF6384',
+                    '#FF9F40',
+                    '#FFCD56',
+                    '#4BC0C0',
+                    '#9966FF'
+                ]
             }]
         },
         options: {
             responsive: false,   // 🔒 fixed size
             plugins: {
-                legend: { display: true }
-            },
-            scales: {
-                y: { beginAtZero: true }
+                legend: {
+                    position: 'top'
+                }
             }
         }
     }

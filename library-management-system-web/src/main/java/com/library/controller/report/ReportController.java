@@ -1,13 +1,11 @@
 package com.library.controller.report;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 
-import com.library.model.report.BookBorrowReport;
 import com.library.model.user.User;
 import com.library.service.report.ReportService;
 
@@ -36,10 +34,8 @@ public class ReportController extends HttpServlet {
             return;
         }
 
-        // Path after /reports
         String path = request.getPathInfo();
 
-        // ✅ Default safety
         if (path == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
@@ -58,7 +54,8 @@ public class ReportController extends HttpServlet {
                 "/WEB-INF/views/report/most-borrowed-books.jsp"
             ).forward(request, response);
 
-        } else if ("/issued".equals(path)) {
+        } 
+        else if ("/issued".equals(path)) {
 
             request.setAttribute(
                 "reports",
@@ -69,7 +66,8 @@ public class ReportController extends HttpServlet {
                 "/WEB-INF/views/report/currently-issued-books.jsp"
             ).forward(request, response);
 
-        } else if ("/overdue".equals(path)) {
+        } 
+        else if ("/overdue".equals(path)) {
 
             request.setAttribute(
                 "reports",
@@ -79,7 +77,9 @@ public class ReportController extends HttpServlet {
             request.getRequestDispatcher(
                 "/WEB-INF/views/report/overdue-books.jsp"
             ).forward(request, response);
-        }else if ("/members".equals(path)) {
+
+        } 
+        else if ("/members".equals(path)) {
 
             request.setAttribute(
                 "reports",
@@ -89,7 +89,9 @@ public class ReportController extends HttpServlet {
             request.getRequestDispatcher(
                 "/WEB-INF/views/report/member-activity.jsp"
             ).forward(request, response);
-        }else if ("/monthly".equals(path)) {
+
+        } 
+        else if ("/monthly".equals(path)) {
 
             request.setAttribute(
                 "reports",
@@ -99,13 +101,56 @@ public class ReportController extends HttpServlet {
             request.getRequestDispatcher(
                 "/WEB-INF/views/report/monthly-borrowing.jsp"
             ).forward(request, response);
-        }
 
-        
-        
+        } 
+        else if ("/categories".equals(path)) {
+
+            request.setAttribute(
+                "reports",
+                reportService.getBooksByCategory()
+            );
+
+            request.getRequestDispatcher(
+                "/WEB-INF/views/report/books-by-category.jsp"
+            ).forward(request, response);
+
+        } 
+        // ================= DASHBOARD =================
+        else if ("/dashboard".equals(path)) {
+
+            request.setAttribute(
+                "mostBorrowed",
+                reportService.getMostBorrowedBooks()
+            );
+
+            // ✅ REUSE member activity for top borrowers
+            request.setAttribute(
+                "topBorrowers",
+                reportService.getMemberActivityReport()
+            );
+
+            request.setAttribute(
+                "issuedBooks",
+                reportService.getCurrentlyIssuedBooks()
+            );
+
+            request.setAttribute(
+                "booksByCategory",
+                reportService.getBooksByCategory()
+            );
+
+            request.setAttribute(
+                "monthlyTrends",
+                reportService.getMonthlyBorrowingTrends()
+            );
+
+            request.getRequestDispatcher(
+                "/WEB-INF/views/report/dashboard.jsp"
+            ).forward(request, response);
+
+        } 
         else {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
     }
-
 }

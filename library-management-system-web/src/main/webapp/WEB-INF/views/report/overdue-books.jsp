@@ -17,6 +17,14 @@
 </c:if>
 
 <c:if test="${not empty reports}">
+
+    <!-- ================= CHART ================= -->
+    <h3>Overdue Duration (Days)</h3>
+    <canvas id="overdueBooksChart" width="650" height="240"></canvas>
+
+    <br/>
+
+    <!-- ================= TABLE ================= -->
     <table border="1" cellpadding="8">
         <tr>
             <th>Book Title</th>
@@ -36,10 +44,59 @@
             </tr>
         </c:forEach>
     </table>
+
 </c:if>
 
 <br/>
 <a href="${pageContext.request.contextPath}/books">Back to Books</a>
+
+<!-- ================= CHART.JS ================= -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+/*
+ Each bar = one overdue loan
+ Height = number of overdue days
+*/
+
+const overdueLabels = [
+<c:forEach var="r" items="${reports}">
+    "${r.bookTitle} (${r.username})",
+</c:forEach>
+];
+
+const overdueData = [
+<c:forEach var="r" items="${reports}">
+    ${r.overdueDays},
+</c:forEach>
+];
+
+new Chart(
+    document.getElementById("overdueBooksChart"),
+    {
+        type: "bar",
+        data: {
+            labels: overdueLabels,
+            datasets: [{
+                label: "Overdue Days",
+                data: overdueData,
+                backgroundColor: "#FF6384"
+            }]
+        },
+        options: {
+            responsive: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    }
+);
+</script>
 
 </body>
 </html>
