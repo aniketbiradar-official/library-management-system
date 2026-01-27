@@ -3,16 +3,19 @@ package com.library.service.report;
 import java.util.List;
 
 import com.library.dao.report.ReportDAO;
-import com.library.model.report.BookBorrowReport;
+import com.library.model.report.IssuedBookReport;
 
-/**
- * Service layer for reports
- */
 public class ReportService {
 
     private final ReportDAO reportDAO = new ReportDAO();
 
-    public List<BookBorrowReport> getMostBorrowedBooks() {
+    // ================= REPORT 1 =================
+    public List<?> getMostBorrowedBooks() {
         return reportDAO.getMostBorrowedBooks();
+    }
+
+    // ================= REPORT 2 (FIX) =================
+    public List<IssuedBookReport> getCurrentlyIssuedBooks() {
+        return reportDAO.getCurrentlyIssuedBooks();
     }
 }

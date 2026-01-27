@@ -14,7 +14,7 @@ import com.library.service.report.ReportService;
 /**
  * Controller for Reports
  */
-@WebServlet("/reports/books")
+@WebServlet("/reports/*")
 public class ReportController extends HttpServlet {
 
     private final ReportService reportService = new ReportService();
@@ -28,21 +28,50 @@ public class ReportController extends HttpServlet {
                 ? (User) session.getAttribute("user")
                 : null;
 
-        // Security check
+        // 🔐 Role-based security
         if (user == null ||
-           (!"ADMIN".equals(user.getRole()) && !"LIBRARIAN".equals(user.getRole()))) {
+            (!"ADMIN".equals(user.getRole()) && !"LIBRARIAN".equals(user.getRole()))) {
 
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied");
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
 
-        List<BookBorrowReport> reports =
-                reportService.getMostBorrowedBooks();
+        // Path after /reports
+        String path = request.getPathInfo();
 
-        request.setAttribute("reports", reports);
+        // ✅ Default safety
+        if (path == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
 
-        request.getRequestDispatcher(
-                "/WEB-INF/views/report/most-borrowed-books.jsp")
-               .forward(request, response);
+        // ================= REPORT ROUTING =================
+
+        if ("/books".equals(path)) {
+
+            request.setAttribute(
+                "reports",
+                reportService.getMostBorrowedBooks()
+            );
+
+            request.getRequestDispatcher(
+                "/WEB-INF/views/report/most-borrowed-books.jsp"
+            ).forward(request, response);
+
+        } else if ("/issued".equals(path)) {
+
+            request.setAttribute(
+                "reports",
+                reportService.getCurrentlyIssuedBooks()
+            );
+
+            request.getRequestDispatcher(
+                "/WEB-INF/views/report/currently-issued-books.jsp"
+            ).forward(request, response);
+
+        } else {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        }
     }
+
 }
