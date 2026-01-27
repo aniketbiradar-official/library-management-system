@@ -79,7 +79,20 @@ public class ReportController extends HttpServlet {
             request.getRequestDispatcher(
                 "/WEB-INF/views/report/overdue-books.jsp"
             ).forward(request, response);
-        } else {
+        }else if ("/members".equals(path)) {
+
+            request.setAttribute(
+                "reports",
+                reportService.getMemberActivityReport()
+            );
+
+            request.getRequestDispatcher(
+                "/WEB-INF/views/report/member-activity.jsp"
+            ).forward(request, response);
+        }
+
+        
+        else {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
     }

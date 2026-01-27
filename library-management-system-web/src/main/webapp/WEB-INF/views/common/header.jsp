@@ -34,6 +34,13 @@
 	        Overdue Books
 	      </a>
 	</c:if>
+	
+	<c:if test="${sessionScope.user.role == 'ADMIN' || sessionScope.user.role == 'LIBRARIAN'}">
+	    | <a href="${pageContext.request.contextPath}/reports/members">
+	        Member Activity
+	      </a>
+	</c:if>
+	
     
 
     <!-- ================= LOGOUT ================= -->

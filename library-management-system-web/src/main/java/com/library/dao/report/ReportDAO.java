@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.library.model.report.BookBorrowReport;
 import com.library.model.report.IssuedBookReport;
+import com.library.model.report.MemberActivityReport;
 import com.library.model.report.OverdueBookReport;
 import com.library.util.DBConnectionUtil;
 
@@ -119,6 +120,38 @@ public class ReportDAO {
 
         } catch (SQLException e) {
             throw new RuntimeException("Error fetching overdue books report", e);
+        }
+
+        return reports;
+    }
+
+    public List<MemberActivityReport> getMemberActivityReport() {
+
+        String sql = """
+            SELECT
+                u.username,
+                COUNT(l.id) AS total_borrowed
+            FROM book_loans l
+            JOIN users u ON l.user_id = u.id
+            GROUP BY u.id, u.username
+            ORDER BY total_borrowed DESC
+        """;
+
+        List<MemberActivityReport> reports = new ArrayList<>();
+
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                MemberActivityReport r = new MemberActivityReport();
+                r.setUsername(rs.getString("username"));
+                r.setTotalBorrowed(rs.getLong("total_borrowed"));
+                reports.add(r);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching member activity report", e);
         }
 
         return reports;
