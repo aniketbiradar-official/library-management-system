@@ -5,6 +5,7 @@
 <html>
 <head>
     <title>Monthly Borrowing Trends</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -17,21 +18,47 @@
 </c:if>
 
 <c:if test="${not empty reports}">
-    <table border="1" cellpadding="8">
-        <tr>
-            <th>Year</th>
-            <th>Month</th>
-            <th>Total Books Borrowed</th>
-        </tr>
+    <canvas id="monthlyChart" width="800" height="400"></canvas>
 
-        <c:forEach var="r" items="${reports}">
-            <tr>
-                <td>${r.year}</td>
-                <td>${r.month}</td>
-                <td>${r.totalBorrowed}</td>
-            </tr>
-        </c:forEach>
-    </table>
+    <script>
+        const labels = [
+            <c:forEach var="r" items="${reports}" varStatus="status">
+                "${r.year}-${r.month}"
+                <c:if test="${!status.last}">,</c:if>
+            </c:forEach>
+        ];
+
+        const dataValues = [
+            <c:forEach var="r" items="${reports}" varStatus="status">
+                ${r.totalBorrowed}
+                <c:if test="${!status.last}">,</c:if>
+            </c:forEach>
+        ];
+
+        const ctx = document.getElementById('monthlyChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Books Borrowed Per Month',
+                    data: dataValues,
+                    borderWidth: 2,
+                    tension: 0.3,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
 </c:if>
 
 <br/>
