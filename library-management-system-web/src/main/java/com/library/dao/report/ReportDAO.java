@@ -7,6 +7,7 @@ import java.util.List;
 import com.library.model.report.BookBorrowReport;
 import com.library.model.report.IssuedBookReport;
 import com.library.model.report.MemberActivityReport;
+import com.library.model.report.MonthlyBorrowReport;
 import com.library.model.report.OverdueBookReport;
 import com.library.util.DBConnectionUtil;
 
@@ -152,6 +153,39 @@ public class ReportDAO {
 
         } catch (SQLException e) {
             throw new RuntimeException("Error fetching member activity report", e);
+        }
+
+        return reports;
+    }
+
+    public List<MonthlyBorrowReport> getMonthlyBorrowingTrends() {
+
+        String sql = """
+            SELECT
+                YEAR(issue_date) AS year,
+                MONTH(issue_date) AS month,
+                COUNT(id) AS total_borrowed
+            FROM book_loans
+            GROUP BY YEAR(issue_date), MONTH(issue_date)
+            ORDER BY year DESC, month DESC
+        """;
+
+        List<MonthlyBorrowReport> reports = new ArrayList<>();
+
+        try (Connection conn = DBConnectionUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                MonthlyBorrowReport r = new MonthlyBorrowReport();
+                r.setYear(rs.getInt("year"));
+                r.setMonth(rs.getInt("month"));
+                r.setTotalBorrowed(rs.getLong("total_borrowed"));
+                reports.add(r);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error fetching monthly borrowing trends", e);
         }
 
         return reports;

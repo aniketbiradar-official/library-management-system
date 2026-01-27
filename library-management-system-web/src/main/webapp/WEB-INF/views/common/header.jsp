@@ -41,6 +41,11 @@
 	      </a>
 	</c:if>
 	
+    <c:if test="${sessionScope.user.role == 'ADMIN' || sessionScope.user.role == 'LIBRARIAN'}">
+	    | <a href="${pageContext.request.contextPath}/reports/monthly">
+	        Monthly Borrowing Trends
+	      </a>
+	</c:if>
     
 
     <!-- ================= LOGOUT ================= -->
