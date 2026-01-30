@@ -5,8 +5,13 @@
 <html>
 <head>
     <title>Library Books</title>
+    <jsp:include page="/WEB-INF/views/common/head.jsp"/>
+    
 </head>
 <body>
+
+<div class="app-container">
+
 
 <jsp:include page="/WEB-INF/views/common/header.jsp"/>
 
@@ -155,5 +160,6 @@
     </c:forEach>
 </c:if>
 
+</div>
 </body>
 </html>

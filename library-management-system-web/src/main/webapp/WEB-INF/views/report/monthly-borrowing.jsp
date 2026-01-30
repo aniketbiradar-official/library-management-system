@@ -5,87 +5,152 @@
 <html>
 <head>
     <title>Monthly Borrowing Trends</title>
+
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/layout.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/theme.css">
+
+    <script src="https://kit.fontawesome.com/a2e0e6adcf.js" crossorigin="anonymous"></script>
+    <script defer src="${pageContext.request.contextPath}/assets/js/theme.js"></script>
+    <script defer src="${pageContext.request.contextPath}/assets/js/ui.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-<jsp:include page="/WEB-INF/views/common/header.jsp"/>
+<div class="app-container">
 
-<h2>Monthly Borrowing Trends</h2>
+    <jsp:include page="/WEB-INF/views/common/header.jsp"/>
 
-<c:if test="${empty reports}">
-    <p>No borrowing data available.</p>
-</c:if>
+    <h2>Monthly Borrowing Trends</h2>
 
-<c:if test="${not empty reports}">
+    <c:if test="${empty reports}">
+        <p>No borrowing data available.</p>
+    </c:if>
 
-    <!-- ================= CHART ================= -->
-    <canvas id="monthlyChart" width="700" height="240"></canvas>
+    <c:if test="${not empty reports}">
 
-    <br/><br/>
+        <!-- ================= CHART CARD ================= -->
+        <div class="section-card">
+            <h3>Borrowing Over Time</h3>
 
-    <!-- ================= TABLE ================= -->
-    <table border="1" cellpadding="8">
-        <tr>
-            <th>Year</th>
-            <th>Month</th>
-            <th>Total Borrowed</th>
-        </tr>
+            <!-- Size controlled here -->
+            <div style="max-width: 700px; height: 320px; margin: 0 auto;">
+                <canvas id="monthlyChart"></canvas>
+            </div>
+        </div>
 
-        <c:forEach var="r" items="${reports}">
-            <tr>
-                <td>${r.year}</td>
-                <td>${r.month}</td>
-                <td>${r.totalBorrowed}</td>
-            </tr>
-        </c:forEach>
-    </table>
+        <!-- ================= TABLE CARD ================= -->
+        <div class="section-card">
+            <h3>Monthly Breakdown</h3>
 
-</c:if>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th>Month</th>
+                        <th>Total Borrowed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:forEach var="r" items="${reports}">
+                        <tr>
+                            <td>${r.year}</td>
+                            <td>${r.month}</td>
+                            <td>${r.totalBorrowed}</td>
+                        </tr>
+                    </c:forEach>
+                </tbody>
+            </table>
+        </div>
 
-<br/>
-<a href="${pageContext.request.contextPath}/books">Back to Books</a>
+    </c:if>
 
-<!-- ================= CHART.JS ================= -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <div class="page-actions">
+        <a href="${pageContext.request.contextPath}/books" class="primary-btn">
+            Back to Books
+        </a>
+    </div>
 
+</div>
+
+<!-- ================= CHART INITIALIZATION ================= -->
 <script>
-const labels = [
-<c:forEach var="r" items="${reports}">
-    "${r.year}-${r.month}",
-</c:forEach>
-];
+document.addEventListener("DOMContentLoaded", function () {
 
-const dataValues = [
-<c:forEach var="r" items="${reports}">
-    ${r.totalBorrowed},
-</c:forEach>
-];
+    <c:if test="${not empty reports}">
+    const labels = [
+        <c:forEach var="r" items="${reports}" varStatus="s">
+            "${r.year}-${r.month}"<c:if test="${!s.last}">,</c:if>
+        </c:forEach>
+    ];
 
-new Chart(
-    document.getElementById('monthlyChart'),
-    {
-        type: 'line',
+    const dataValues = [
+        <c:forEach var="r" items="${reports}" varStatus="s">
+            ${r.totalBorrowed}<c:if test="${!s.last}">,</c:if>
+        </c:forEach>
+    ];
+
+    new Chart(document.getElementById("monthlyChart"), {
+        type: "line",
         data: {
             labels: labels,
             datasets: [{
-                label: 'Books Borrowed Per Month',
+                label: "Books Borrowed",
                 data: dataValues,
-                borderWidth: 2,
-                tension: 0.3,
-                fill: false
+                borderColor: "rgba(124, 131, 255, 0.95)",
+                backgroundColor: "rgba(124, 131, 255, 0.15)",
+                tension: 0.35,
+                fill: true,
+                pointRadius: 5,
+                pointHoverRadius: 7
             }]
         },
         options: {
-            responsive: false,   // 🔒 fixed size
+            responsive: true,
+            maintainAspectRatio: false, // 🔑 critical
+            animation: {
+                duration: 800,
+                easing: "easeOutQuart"
+            },
             plugins: {
-                legend: { display: true }
+                legend: {
+                    display: true
+                },
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: "#0f172a",
+                    titleColor: "#ffffff",
+                    bodyColor: "#e5e7eb",
+                    padding: 10,
+                    cornerRadius: 8
+                }
             },
             scales: {
-                y: { beginAtZero: true }
+                x: {
+                    ticks: {
+                        color: "#94a3b8"
+                    },
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: "#94a3b8"
+                    },
+                    grid: {
+                        color: "rgba(255,255,255,0.06)"
+                    }
+                }
             }
         }
-    }
-);
+    });
+    </c:if>
+
+});
 </script>
 
 </body>

@@ -1,33 +1,61 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>Member Registration</title>
+
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/theme.css">
+
+<script src="https://kit.fontawesome.com/a2e0e6adcf.js" crossorigin="anonymous"></script>
+<script defer src="${pageContext.request.contextPath}/assets/js/theme.js"></script>
 </head>
+
 <body>
-	<h2>Member Registration</h2>
 
-<c:if test="${not empty error}">
-    <p style="color:red">${error}</p>
-</c:if>
+<div class="auth-page">
+    <div class="auth-card glass">
 
-<form method="post" action="${pageContext.request.contextPath}/register">
+        <h2 class="text-center">
+            <i class="fa-solid fa-user-plus"></i> Register
+        </h2>
 
-    <label>Username</label><br/>
-    <input type="text" name="username" required />
-    <br/><br/>
+        <c:if test="${not empty error}">
+            <p class="error-text text-center mb-2">${error}</p>
+        </c:if>
 
-    <label>Password</label><br/>
-    <input type="password" name="password" required />
-    <br/><br/>
+        <form method="post" action="${pageContext.request.contextPath}/register">
 
-    <button type="submit">Register</button>
-</form>
+            <input type="text"
+                   name="username"
+                   placeholder="Username"
+                   required />
 
-<br/>
-<a href="${pageContext.request.contextPath}/login">Back to Login</a>
+            <input type="password"
+                   name="password"
+                   placeholder="Password"
+                   required />
+
+            <button type="submit" class="primary-btn">
+                Register
+            </button>
+        </form>
+
+        <!-- Secondary Action -->
+        <div class="mt-3 text-center">
+            <a href="${pageContext.request.contextPath}/login"
+               class="primary-btn"
+               style="background: transparent; box-shadow:none; color: var(--accent-secondary);">
+                Back to Login
+            </a>
+        </div>
+
+    </div>
+</div>
+
 </body>
 </html>

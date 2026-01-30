@@ -5,88 +5,137 @@
 <html>
 <head>
     <title>Books by Category</title>
+
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/layout.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/theme.css">
+
+    <script src="https://kit.fontawesome.com/a2e0e6adcf.js" crossorigin="anonymous"></script>
+    <script defer src="${pageContext.request.contextPath}/assets/js/theme.js"></script>
+    <script defer src="${pageContext.request.contextPath}/assets/js/ui.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-<jsp:include page="/WEB-INF/views/common/header.jsp"/>
+<div class="app-container">
 
-<h2>Books by Category</h2>
+    <jsp:include page="/WEB-INF/views/common/header.jsp"/>
 
-<c:if test="${empty reports}">
-    <p>No category data available.</p>
-</c:if>
+    <h2>Books by Category</h2>
 
-<c:if test="${not empty reports}">
+    <c:if test="${empty reports}">
+        <p>No category data available.</p>
+    </c:if>
 
-    <!-- ================= PIE CHART ================= -->
-    <canvas id="categoryChart" width="420" height="220"></canvas>
+    <c:if test="${not empty reports}">
 
-    <br/><br/>
+        <!-- ================= CHART CARD ================= -->
+        <div class="section-card">
+            <h3>Library Distribution</h3>
 
-    <!-- ================= TABLE ================= -->
-    <table border="1" cellpadding="8">
-        <tr>
-            <th>Category</th>
-            <th>Total Books</th>
-        </tr>
+            <!-- Medium-size pie chart container -->
+            <div style="max-width: 420px; height: 320px; margin: 0 auto;">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
 
-        <c:forEach var="r" items="${reports}">
-            <tr>
-                <td>${r.category}</td>
-                <td>${r.count}</td>
-            </tr>
-        </c:forEach>
-    </table>
+        <!-- ================= TABLE CARD ================= -->
+        <div class="section-card">
+            <h3>Category Breakdown</h3>
 
-</c:if>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Category</th>
+                        <th>Total Books</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:forEach var="r" items="${reports}">
+                        <tr>
+                            <td>${r.category}</td>
+                            <td>${r.count}</td>
+                        </tr>
+                    </c:forEach>
+                </tbody>
+            </table>
+        </div>
 
-<br/>
-<a href="${pageContext.request.contextPath}/books">Back to Books</a>
+    </c:if>
 
-<!-- ================= CHART.JS ================= -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <div class="page-actions">
+        <a href="${pageContext.request.contextPath}/books" class="primary-btn">
+            Back to Books
+        </a>
+    </div>
 
+</div>
+
+<!-- ================= CHART INITIALIZATION ================= -->
 <script>
-const labels = [
-<c:forEach var="r" items="${reports}">
-    "${r.category}",
-</c:forEach>
-];
+document.addEventListener("DOMContentLoaded", function () {
 
-const dataValues = [
-<c:forEach var="r" items="${reports}">
-    ${r.count},
-</c:forEach>
-];
+    <c:if test="${not empty reports}">
+    const labels = [
+        <c:forEach var="r" items="${reports}" varStatus="s">
+            "${r.category}"<c:if test="${!s.last}">,</c:if>
+        </c:forEach>
+    ];
 
-new Chart(
-    document.getElementById('categoryChart'),
-    {
-        type: 'pie',
+    const dataValues = [
+        <c:forEach var="r" items="${reports}" varStatus="s">
+            ${r.count}<c:if test="${!s.last}">,</c:if>
+        </c:forEach>
+    ];
+
+    new Chart(document.getElementById("categoryChart"), {
+        type: "pie",
         data: {
             labels: labels,
             datasets: [{
                 data: dataValues,
                 backgroundColor: [
-                    '#36A2EB',
-                    '#FF6384',
-                    '#FF9F40',
-                    '#FFCD56',
-                    '#4BC0C0',
-                    '#9966FF'
-                ]
+                    "#7c83ff",
+                    "#5eead4",
+                    "#ff6384",
+                    "#ffcd56",
+                    "#4bc0c0",
+                    "#9966ff"
+                ],
+                hoverOffset: 12
             }]
         },
         options: {
-            responsive: false,   // 🔒 fixed size
+            responsive: true,
+            maintainAspectRatio: false, // 🔑 critical
+            animation: {
+                duration: 700,
+                easing: "easeOutQuart"
+            },
             plugins: {
                 legend: {
-                    position: 'top'
+                    position: "bottom",
+                    labels: {
+                        color: "#94a3b8",
+                        padding: 16
+                    }
+                },
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: "#0f172a",
+                    titleColor: "#ffffff",
+                    bodyColor: "#e5e7eb",
+                    padding: 10,
+                    cornerRadius: 8
                 }
             }
         }
-    }
-);
+    });
+    </c:if>
+
+});
 </script>
 
 </body>

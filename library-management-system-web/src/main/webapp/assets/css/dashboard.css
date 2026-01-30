@@ -1,0 +1,191 @@
+@charset "UTF-8";
+
+/* =========================================================
+   DASHBOARD LAYOUT
+   Analytics • Editorial • Professional
+   ========================================================= */
+
+/* -----------------------------
+   DASHBOARD WRAPPER
+--------------------------------*/
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+    padding-top: 12px; /* prevents sticky header overlap */
+}
+
+/* -----------------------------
+   DASHBOARD SECTION
+--------------------------------*/
+.dashboard-section {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.dashboard-section h2 {
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.dashboard-section h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 0.3px;
+}
+
+/* subtle divider */
+.dashboard-divider {
+    height: 1px;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        var(--border-color),
+        transparent
+    );
+    margin: 8px 0 18px;
+}
+
+/* -----------------------------
+   CHART GRID
+--------------------------------*/
+.chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+    gap: 28px;
+}
+
+/* -----------------------------
+   CHART CARD
+--------------------------------*/
+.chart-card {
+    background: var(--bg-surface);
+    border-radius: var(--radius-lg);
+    padding: 24px 22px 26px;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+    min-height: 360px; /* 🔑 prevents canvas collapse */
+    transition:
+        transform var(--transition-fast),
+        box-shadow var(--transition-fast);
+}
+
+.chart-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-glow);
+}
+
+/* gradient accent strip */
+.chart-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 4px;
+    width: 100%;
+    background: var(--gradient-accent);
+}
+
+/* -----------------------------
+   CHART TITLE
+--------------------------------*/
+.chart-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+}
+
+/* -----------------------------
+   CANVAS FIX (CRITICAL)
+--------------------------------*/
+.chart-card canvas {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+}
+
+/* -----------------------------
+   TABLE CARD (REPORT PAGES)
+--------------------------------*/
+.table-card {
+    background: var(--bg-surface);
+    border-radius: var(--radius-lg);
+    padding: 22px;
+    box-shadow: var(--shadow-soft);
+    border: 1px solid var(--border-color);
+    overflow-x: auto;
+}
+
+/* -----------------------------
+   EMPTY STATE
+--------------------------------*/
+.empty-state {
+    padding: 36px;
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+    background: rgba(255,255,255,0.02);
+    border-radius: var(--radius-md);
+}
+
+/* =========================================================
+   CHART SIZE CONTROL (GLOBAL FIX)
+   ========================================================= */
+
+/* Chart container */
+.section-card {
+    max-width: 100%;
+}
+
+/* Force medium-sized charts */
+.section-card canvas {
+    width: 90% !important;
+    max-width: 500px;      /* 👈 medium width */
+    height: 300px !important; /* 👈 medium height */
+    margin: 0 auto;
+    display: block;
+}
+
+/* Slightly smaller pie charts */
+#booksByCategoryChart {
+    max-width: 420px;
+    height: 320px !important;
+}
+
+/* Real chart behavior */
+.chart-card {
+    height: 360px;
+}
+
+.chart-card canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+
+
+/* -----------------------------
+   MOBILE
+--------------------------------*/
+@media (max-width: 768px) {
+
+    .dashboard {
+        gap: 40px;
+    }
+
+    .chart-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-card {
+        min-height: 320px;
+        padding: 20px;
+    }
+}
+

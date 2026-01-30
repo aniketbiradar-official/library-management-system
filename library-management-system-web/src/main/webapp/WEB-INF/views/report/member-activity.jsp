@@ -5,83 +5,148 @@
 <html>
 <head>
     <title>Member Activity Report</title>
+
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/base.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/layout.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/theme.css">
+
+    <script src="https://kit.fontawesome.com/a2e0e6adcf.js" crossorigin="anonymous"></script>
+    <script defer src="${pageContext.request.contextPath}/assets/js/theme.js"></script>
+    <script defer src="${pageContext.request.contextPath}/assets/js/ui.js"></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-<jsp:include page="/WEB-INF/views/common/header.jsp"/>
+<div class="app-container">
 
-<h2>Member Activity — Top Borrowers</h2>
+    <jsp:include page="/WEB-INF/views/common/header.jsp"/>
 
-<c:if test="${empty reports}">
-    <p>No borrowing activity found.</p>
-</c:if>
+    <h2>Member Activity — Top Borrowers</h2>
 
-<c:if test="${not empty reports}">
+    <c:if test="${empty reports}">
+        <p>No borrowing activity found.</p>
+    </c:if>
 
-    <!-- ================= CHART ================= -->
-    <canvas id="topBorrowersChart" width="600" height="220"></canvas>
+    <c:if test="${not empty reports}">
 
-    <br/><br/>
+        <!-- ================= CHART CARD ================= -->
+        <div class="section-card">
+            <h3>Top Borrowers (Graph)</h3>
 
-    <!-- ================= TABLE ================= -->
-    <table border="1" cellpadding="8">
-        <tr>
-            <th>Member</th>
-            <th>Total Books Borrowed</th>
-        </tr>
+            <!-- IMPORTANT: wrapper controls size -->
+            <div style="max-width: 600px; height: 300px; margin: 0 auto;">
+                <canvas id="topBorrowersChart"></canvas>
+            </div>
+        </div>
 
-        <c:forEach var="r" items="${reports}">
-            <tr>
-                <td>${r.username}</td>
-                <td>${r.totalBorrowed}</td>
-            </tr>
-        </c:forEach>
-    </table>
+        <!-- ================= TABLE ================= -->
+        <div class="section-card">
+            <h3>Borrowing Details</h3>
 
-</c:if>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Member</th>
+                        <th>Total Books Borrowed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:forEach var="r" items="${reports}">
+                        <tr>
+                            <td>${r.username}</td>
+                            <td>${r.totalBorrowed}</td>
+                        </tr>
+                    </c:forEach>
+                </tbody>
+            </table>
+        </div>
 
-<br/>
-<a href="${pageContext.request.contextPath}/books">Back to Books</a>
+    </c:if>
 
-<!-- ================= CHART.JS ================= -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <div class="page-actions">
+        <a href="${pageContext.request.contextPath}/books" class="primary-btn">
+            Back to Books
+        </a>
+    </div>
 
+</div>
+
+<!-- ================= CHART INITIALIZATION ================= -->
 <script>
-const borrowerLabels = [
-<c:forEach var="r" items="${reports}">
-    "${r.username}",
-</c:forEach>
-];
+document.addEventListener("DOMContentLoaded", function () {
 
-const borrowCounts = [
-<c:forEach var="r" items="${reports}">
-    ${r.totalBorrowed},
-</c:forEach>
-];
+    <c:if test="${not empty reports}">
+    const labels = [
+        <c:forEach var="r" items="${reports}" varStatus="s">
+            "${r.username}"<c:if test="${!s.last}">,</c:if>
+        </c:forEach>
+    ];
 
-new Chart(
-    document.getElementById('topBorrowersChart'),
-    {
-        type: 'bar',
+    const data = [
+        <c:forEach var="r" items="${reports}" varStatus="s">
+            ${r.totalBorrowed}<c:if test="${!s.last}">,</c:if>
+        </c:forEach>
+    ];
+
+    new Chart(document.getElementById("topBorrowersChart"), {
+        type: "bar",
         data: {
-            labels: borrowerLabels,
+            labels: labels,
             datasets: [{
-                label: 'Total Books Borrowed',
-                data: borrowCounts,
-                backgroundColor: '#36A2EB'
+                label: "Total Books Borrowed",
+                data: data,
+                backgroundColor: "rgba(124, 131, 255, 0.85)",
+                hoverBackgroundColor: "rgba(94, 234, 212, 0.95)",
+                borderRadius: 8,
+                barThickness: 36
             }]
         },
         options: {
-            responsive: false,   // 🔒 prevents resizing/scroll
+            responsive: true,
+            maintainAspectRatio: false, // 🔑 critical fix
+            animation: {
+                duration: 700,
+                easing: "easeOutQuart"
+            },
             plugins: {
-                legend: { display: true }
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    enabled: true,
+                    backgroundColor: "#0f172a",
+                    titleColor: "#fff",
+                    bodyColor: "#e5e7eb",
+                    padding: 10,
+                    cornerRadius: 8
+                }
             },
             scales: {
-                y: { beginAtZero: true }
+                x: {
+                    ticks: {
+                        color: "#94a3b8"
+                    },
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: "#94a3b8"
+                    },
+                    grid: {
+                        color: "rgba(255,255,255,0.06)"
+                    }
+                }
             }
         }
-    }
-);
+    });
+    </c:if>
+
+});
 </script>
 
 </body>
